@@ -1,12 +1,22 @@
 #include <time.h>
+#include <keyboard.h>
 #include <stdint.h>
 
+#define KEYBOARD 1
+#define TIMER 0
+
+
 static void int_20();
+static void int_21();
+
 
 void irqDispatcher(uint64_t irq) {
 	switch (irq) {
-		case 0:
+		case TIMER:
 			int_20();
+			break;
+		case KEYBOARD:
+			int_21();
 			break;
 	}
 	return;
@@ -14,4 +24,8 @@ void irqDispatcher(uint64_t irq) {
 
 void int_20() {
 	timer_handler();
+}
+
+void int_21(){
+	keyboard_handler();
 }
