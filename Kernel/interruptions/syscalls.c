@@ -15,9 +15,19 @@ uint64_t* getRegisters(){
     return registers;
 }
 
-//todo fede hacete esto xddddddd
-void * int_80(uint8_t fd, void * arg1, void * arg2, void * arg3, void * arg4){
-    
+void syscallHandler(uint8_t rax, uint64_t arg0, uint64_t arg1, uint64_t arg2) {
+    switch (rax) {
+        case WRITE: 
+            for (int i = 0; i < (size_t)arg2; i += 1) {
+                if (arg0 == STDOUT) {
+                    ncPrintChar(((char *)arg1)[i]);
+                } else {
+                    ncPrintCharColor(((char *)arg1)[i], RED);
+                }
+            }
+        break;
+    }
+    return;
 }
 
 

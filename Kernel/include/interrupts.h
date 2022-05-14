@@ -9,6 +9,7 @@
 #define INTERRUPS_H_
 
 #include <idtLoader.h>
+#include <stdint.h>
 
 void _irq00Handler(void);
 void _irq01Handler(void);
@@ -16,6 +17,7 @@ void _irq02Handler(void);
 void _irq03Handler(void);
 void _irq04Handler(void);
 void _irq05Handler(void);
+void _irq80Handler(void);
 
 void _exception0Handler(void);
 
