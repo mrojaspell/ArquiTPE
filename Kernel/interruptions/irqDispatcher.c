@@ -1,6 +1,7 @@
 #include <time.h>
 #include <keyboard.h>
 #include <stdint.h>
+#include <naiveConsole.h>
 
 #define KEYBOARD 1
 #define TIMER 0

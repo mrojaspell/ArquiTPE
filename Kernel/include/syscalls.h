@@ -1,6 +1,7 @@
 #ifndef SYSCALLS_H
 #define SYSCALLS_H
 #include <stdint.h>
+#include <stdlib.h>
 
 #define WRITE 0x01
 uint8_t getCurrentTime(uint64_t rtcID);

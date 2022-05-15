@@ -2,6 +2,8 @@
 #include <string.h>
 #include <lib.h>
 #include <moduleLoader.h>
+#include <idtLoader.h>
+#include <console.h>
 #include <naiveConsole.h>
 
 extern uint8_t text;
@@ -82,6 +84,7 @@ void * initializeKernelBinary()
 
 int main()
 {	
+	load_idt();
 	ncPrint("[Kernel Main]");
 	ncNewline();
 	ncPrint("  Sample code module at 0x");
@@ -100,5 +103,8 @@ int main()
 	ncNewline();
 
 	ncPrint("[Finished]");
+	ncClear();
+
+	while(1);
 	return 0;
 }

@@ -2,7 +2,7 @@
 #define KEYBOARD_DRIVER
 
 #include <stdint.h>
-#include <naiveConsole.h>
+#include <console.h>
 #include <lib.h>
 #include <colors.h>
 

@@ -1,3 +1,5 @@
+#include <keyboard.h>
+
 
 //https://www.qbasic.net/en/reference/general/scan-codes.htm
 static char charTable[58][2] = {
@@ -103,6 +105,8 @@ static char shift_kbd_US [128] =
 static uint8_t buffer[BUFFER_LENGTH];
 static int shiftFlagd = 0;
 
+extern uint8_t getKey();
+
 //para que no printee cosas raras cuando toco una tecla no imprimible como el control
 int isPrintable(uint8_t c){
     return ((c>= 32 && c<=126) || (c == BACKSPACE) || (c == ENTER)); //esos son los numeros imprimibles en la tabla ascii
@@ -131,7 +135,10 @@ void keyboard_handler(){
     }
     else{
         if (teclahex < RELEASE && isPrintable(kbd_US[teclahex]))
-            to_buffer(teclahex);
+            {
+                to_buffer(teclahex);
+                printChar(STDIN, kbd_US[teclahex]); // BORRAR DESPUES
+            }
     }
 }
 

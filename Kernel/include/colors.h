@@ -2,6 +2,7 @@
 #define COLORS_H
 
 #include <stdint.h>
+#include <stdlib.h>
 
 // para obtener un background se hace << 4
 // para utilizar un color con un backround
@@ -24,6 +25,6 @@
 #define WHITE    0x0F
 #define DEFAULTCOLOR (LGREY+(BLACK<<4))
 
-typedef uint8_t color_t
+typedef uint8_t color_t;
 
 #endif //COLORS_H

@@ -1,62 +1,120 @@
 #include <console.h>
 #include <colors.h>
+#include <naiveConsole.h>
 
 static uint8_t * const video = (uint8_t*)0xB8000;
-static const uint32_t width = 80;
-static const uint32_t height = 25 ;
+
+static const uint32_t width = SCREEN_WIDTH;
+static const uint32_t height = SCREEN_HEIGHT;
 
 static window windows[5] = {
   { //stdin
-    width, 3, 0, 22, 0, 22
+    SCREEN_WIDTH, 3, {0, 22}, {0, 22}
   },
   { //stdout
-    width, 21, 0, 0, 0, 0
+    SCREEN_WIDTH, 21, {0, 0}, {0, 0}
   },
   { //stderr
-    width, 21, 0, 0, 0, 0
+    SCREEN_WIDTH, 21, {0, 0}, {0, 0}
   },
   { //stleft
-    width / 2, 21, 0, 0, 0, 0
+    SCREEN_WIDTH / 2, 21, {0, 0}, {0, 0}
   },
   { //stdright
-    width / 2, 21, width / 2, 0, 0, 0
+    SCREEN_WIDTH / 2, 21, {SCREEN_WIDTH / 2, 0}, {SCREEN_WIDTH / 2, 0}
   }
 };
 
+void goNextPosition(window* win);
+uint8_t* getPosition(int y, int x);
+
+void restartCursor(FILE_DESCRIPTOR fd) {
+  windows[fd].currPos.x = windows[fd].start.x;
+  windows[fd].currPos.y = windows[fd].start.y;
+}
+
 void clear_screen(FILE_DESCRIPTOR fd) {
-  window current = windows[fd];
-  for (int h = current.startY; h <= current.currentY; h += 1) {
-    for (int w = current.startX; h <= current.width; w += 1) {
-      
+  restartCursor(fd);
+    
+  for (int h = 0; h <= windows[fd].height; h += 1) {
+    newLine(fd);
+  }
+
+  restartCursor(fd);
+}
+
+void scrollUp(FILE_DESCRIPTOR fd) {
+  window win = windows[fd];
+  for (int i = 1; i < win.height; i += 1) {
+    for (int j = 0; j < win.width; j += 1) {
+      *(getPosition(i - 1, j)) = *(getPosition(i, j));
     }
+  }
+
+  // Limpia la ultima linea
+  for (int j = 0; j < win.width; j += 1) {
+    *(getPosition(win.start.y + win.height - 1, j)) = ' ';
+  }
+  windows[fd].currPos.y -= 1;
+}
+
+void print(FILE_DESCRIPTOR fd, char* str, size_t count) {
+  for (int i = 0; i < count; i += 1) {
+    printChar(fd, str[i]);
   }
 }
 
-void printCharColor(FILE_DESCRIPTOR fd, uint8_t c, color_t charColor, color_t bgColor){
-  window current = windows[fd];
+
+void newLine(FILE_DESCRIPTOR fd) {
+  do {
+    printChar(fd, ' ');
+  } while (windows[fd].currPos.x != windows[fd].start.x);
+}
+
+void printChar(FILE_DESCRIPTOR fd, char c) {
+  printCharColor(fd, c, LGREY, BLACK);
+}
+
+void printCharColor(FILE_DESCRIPTOR fd, char c, color_t charColor, color_t bgColor){
   if(c == '\b') {
-    if(current.currentX == current.startX){        
-        current.currentY -= 1;                               
-        current.currentX = current.width-1;
+    if(windows[fd].currPos.x == windows[fd].start.x){        
+        windows[fd].currPos.y -= 1;                               
+        windows[fd].currPos.x = windows[fd].width-1;
         printCharColor(fd, ' ', charColor, bgColor);
-        current.currentY -= 1;
-        current.currentX = current.width-1;
+        windows[fd].currPos.y -= 1;
+        windows[fd].currPos.x = windows[fd].width-1;
     } else {
-      current.currentX = (current.currentX-1) % current.width;
-      printCharFormat(' ', charColor, bgColor);
-      current.currentX = (current.currentX-1) % current.width;
+      windows[fd].currPos.x = (windows[fd].currPos.x-1) % windows[fd].width;
+      printCharColor(fd, ' ', charColor, bgColor);
+      windows[fd].currPos.x = (windows[fd].currPos.x-1) % windows[fd].width;
     }
     return;
   }
-  
-  checkSpace(); // falta hacer
+
+  if (windows[fd].currPos.y == windows[fd].height + windows[fd].start.y) {
+    scrollUp(fd);
+  }
 
   // Newline
   if(c == '\n'){
-      newLine(); // falta hacer
+      newLine(fd);
       return;
   }
+  
+  uint8_t* current = getPosition(windows[fd].currPos.y, windows[fd].currPos.x);
+  *(current) = c;
+  *(current + 1) = (fd == STDERR) ? ((BLACK << 4) | RED) : ((bgColor << 4) | charColor);
+  
+  goNextPosition(&(windows[fd]));
+}
 
 
-  getNextPosition(); // falta hacer
+uint8_t* getPosition(int y, int x) {
+  return (video + x * 2 + y * width * 2);
+}
+
+void goNextPosition(window* win) {
+  int goNextLine = win->currPos.x == (win->start.x + win->width - 1);
+  win->currPos.x = (!goNextLine) ? win->currPos.x + 1 : 0;
+  win->currPos.y += goNextLine;
 }

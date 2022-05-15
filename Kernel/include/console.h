@@ -2,14 +2,22 @@
 #define CONSOLE_H
 
 #include <stdint.h>
+#include <stdlib.h>
+#include <colors.h>
 
-typedef struct window{
+#define SCREEN_WIDTH 80
+#define SCREEN_HEIGHT 25
+
+typedef struct {
+	uint8_t x;
+	uint8_t y;
+} vec;
+
+typedef struct window {
     uint8_t width;
     uint8_t height;
-    uint8_t startX;
-    uint8_t startY;
-    uint8_t currentX;
-    uint8_t currentY;
+    vec start;
+    vec currPos;
 } window;
 
 typedef enum {
@@ -55,6 +63,14 @@ struct vbe_mode_info_structure {
 	uint8_t reserved1[206];
 } __attribute__ ((packed));
 
+
+void newLine(FILE_DESCRIPTOR fd);
+void printCharColor(FILE_DESCRIPTOR fd, char c, color_t charColor, color_t bgColor);
+void printChar(FILE_DESCRIPTOR fd, char c);
+void clear_screen(FILE_DESCRIPTOR fd);
+void restartCursor(FILE_DESCRIPTOR fd);
+void scrollUp(FILE_DESCRIPTOR fd);
+void print(FILE_DESCRIPTOR fd, char* str, size_t count);
 
 #endif
 
