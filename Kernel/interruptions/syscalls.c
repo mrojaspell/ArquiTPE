@@ -6,7 +6,6 @@
 
 // static uint64_t regs[16] = {0};
 
-extern uint8_t getRTCInfo(uint64_t);
 
 uint8_t getCurrentTime(uint64_t rtcID){
 	uint8_t x = getRTCInfo(rtcID);
@@ -18,8 +17,6 @@ uint64_t* getRegisters(){
     // return registers;
     return 0; //??
 }
-
-void sys_write(FILE_DESCRIPTOR fd, char* string, size_t count);
 
 
 void syscallHandler(uint8_t rax, void* arg0, void* arg1, void* arg2) {
@@ -33,6 +30,10 @@ void syscallHandler(uint8_t rax, void* arg0, void* arg1, void* arg2) {
 
 void sys_write(FILE_DESCRIPTOR fd, char* string, size_t count) {
     print(fd, string, count);
+}
+
+uint64_t sys_read(){
+    getChar();
 }
 
 /*void * int_80(uint8_t argc, void * argv[] ) { }*/

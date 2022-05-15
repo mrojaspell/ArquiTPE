@@ -28,19 +28,19 @@ static window windows[5] = {
 void goNextPosition(window* win);
 uint8_t* getPosition(int y, int x);
 
-void restartCursor(FILE_DESCRIPTOR fd) {
+void restartCurrentPos(FILE_DESCRIPTOR fd) {
   windows[fd].currPos.x = windows[fd].start.x;
   windows[fd].currPos.y = windows[fd].start.y;
 }
 
 void clear_screen(FILE_DESCRIPTOR fd) {
-  restartCursor(fd);
+  restartCurrentPos(fd);
     
   for (int h = 0; h <= windows[fd].height; h += 1) {
     newLine(fd);
   }
 
-  restartCursor(fd);
+  restartCurrentPos(fd);
 }
 
 void scrollUp(FILE_DESCRIPTOR fd) {

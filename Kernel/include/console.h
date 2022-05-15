@@ -68,7 +68,7 @@ void newLine(FILE_DESCRIPTOR fd);
 void printCharColor(FILE_DESCRIPTOR fd, char c, color_t charColor, color_t bgColor);
 void printChar(FILE_DESCRIPTOR fd, char c);
 void clear_screen(FILE_DESCRIPTOR fd);
-void restartCursor(FILE_DESCRIPTOR fd);
+void restartCurrentPos(FILE_DESCRIPTOR fd);
 void scrollUp(FILE_DESCRIPTOR fd);
 void print(FILE_DESCRIPTOR fd, char* str, size_t count);
 

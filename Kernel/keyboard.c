@@ -107,17 +107,32 @@ static int shiftFlagd = 0;
 
 extern uint8_t getKey();
 
+
+static uint8_t size = 0;
+static uint16_t read_i = 0;
+static uint16_t write_i = 0;
+
+
+void loadInBuffer(char c){
+    if(c != 0){
+        buffer[write_i++] = c;
+        if( write_i == BUFFER_LENGTH){
+            write_i = 0;                // overflow protection
+        }
+        if(size << BUFFER_LENGTH){
+            size++;
+        }else{
+            read_i++;
+            if(read_i == BUFFER_LENGTH){
+                read_i = 0;
+            }
+        }
+    }
+}
+
 //para que no printee cosas raras cuando toco una tecla no imprimible como el control
 int isPrintable(uint8_t c){
     return ((c>= 32 && c<=126) || (c == BACKSPACE) || (c == ENTER)); //esos son los numeros imprimibles en la tabla ascii
-}
-
-static uint8_t buffer[BUFFER_LENGTH] = {0};
-static uint8_t size = 0;
-static uint8_t current = 0;
-
-void to_buffer(char c){
-    buffer[size++] = c;
 }
 
 void keyboard_handler(){
@@ -131,14 +146,49 @@ void keyboard_handler(){
         shiftFlagd = 0;
     else if (shiftFlagd) { //si es algo imprimible (no de retorno)
         if(teclahex < RELEASE && isPrintable(shift_kbd_US[teclahex]))
-            to_buffer(teclahex);
+            loadInBuffer(teclahex);
     }
     else{
         if (teclahex < RELEASE && isPrintable(kbd_US[teclahex]))
             {
-                to_buffer(teclahex);
+                loadInBuffer(teclahex);
                 printChar(STDIN, kbd_US[teclahex]); // BORRAR DESPUES
             }
     }
 }
+
+char get_char(){
+    char c = 0;
+    c = removeFromBuffer();
+    if(c=='\b'){
+        removeCharFromBuffer();
+    }
+    while(c==-1){
+        cursor();
+        _hlt();
+         c=removeCharFromBuffer();
+    }
+    stopCursor();
+    return c;
+}
+
+void cleanBuffer(){
+    size = write_i = read_i = 0;
+}
+int bufferSize(){
+    return size;
+}
+char removeFromBuffer(){
+    if(size <= 0){
+        return -1;          //empty buffer
+    }
+    
+    size--;
+    char c = buffer[read_i];
+    read_i = (read_i + 1) % BUFFER_LENGTH;
+    return c;
+}
+
+
+
 

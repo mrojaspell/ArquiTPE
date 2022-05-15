@@ -12,5 +12,11 @@ void printKey(uint8_t key);
 void printKeyMayus(uint8_t key);
 
 void keyboard_handler();
+void loadInBuffer(char c)
+char get_char();
+void cleanBuffer();
+int bufferSize();
+char removeFromBuffer();
+
 
 #endif
