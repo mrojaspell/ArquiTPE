@@ -1,5 +1,6 @@
 GLOBAL cpuVendor
 GLOBAL getKey
+GLOBAL hasKey
 GLOBAL getRTCInfo
 
 section .text
@@ -28,15 +29,23 @@ cpuVendor:
 	pop rbp
 	ret
 
+; devuelve 1 si hay una tecla y cero sino
+hasKey:
+    push rbp
+    mov rbp, rsp
+
+    mov rax,0
+    in al, 0x64
+    and al, 0x01
+    
+    mov rsp, rbp
+    pop rbp
+    ret
+
 getKey:
     push rbp
     mov rbp, rsp
     mov rax,0 ;limpio el registro
-
-    ;lo podria hacer por seguridad pero siempre voy a tener una tecla en realidad
-    ;in al,0x64 ;checkeo si se presiono una tecla
-    ;and al,0x01
-    ;cmp al,0 ; me fijo si el ultimo bit en al es cero
 
     in al,0x60 ;agarro la tecla presionada
 

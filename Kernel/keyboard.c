@@ -92,41 +92,19 @@ static char shift_kbd_US [128] =
 
 
 #include <keyboard.h>
-#define MAXCHARACTERS 25*80
-#define RELEASE 128 //el offset entre el codigo de una tecla y el codigo del release de esa tecla
-#define BACKSPACE 14
-#define ENTER 28
-#define LSHIFT 42
-#define RSHIFT 54
-#define ENDKEY 79
-#define BUFFER_LENGTH 256
 
 
 static uint8_t buffer[BUFFER_LENGTH];
-static int shiftFlagd = 0;
+static int shiftFlag = 0;
+static int ctrlFlag = 0;
 
-extern uint8_t getKey();
-
-
-static uint8_t size = 0;
 static uint16_t read_i = 0;
 static uint16_t write_i = 0;
 
-
-void loadInBuffer(char c){
-    if(c != 0){
-        buffer[write_i++] = c;
-        if( write_i == BUFFER_LENGTH){
-            write_i = 0;                // overflow protection
-        }
-        if(size << BUFFER_LENGTH){
-            size++;
-        }else{
-            read_i++;
-            if(read_i == BUFFER_LENGTH){
-                read_i = 0;
-            }
-        }
+void ctrlAction(uint8_t teclahex, uint64_t rsp){
+    uint8_t key = kbd_US[teclahex];
+    if(key == 'r'){
+        registerSnapshot((uint64_t*) rsp);
     }
 }
 
@@ -135,16 +113,24 @@ int isPrintable(uint8_t c){
     return ((c>= 32 && c<=126) || (c == BACKSPACE) || (c == ENTER)); //esos son los numeros imprimibles en la tabla ascii
 }
 
-void keyboard_handler(){
+void keyboardHandler(uint64_t rsp){
 
     static uint8_t teclahex; //quiero que mantengan sus valores
+    if (!hasKey())
+        return;
+    
     teclahex = getKey();
-
     if (teclahex == RSHIFT || teclahex == LSHIFT) //si toco shift
-        shiftFlagd = 1;
+        shiftFlag = 1;
     else if (teclahex == RSHIFT+RELEASE || teclahex == LSHIFT+RELEASE) //si antes habia tocado shift y ahora toque una letra
-        shiftFlagd = 0;
-    else if (shiftFlagd) { //si es algo imprimible (no de retorno)
+        shiftFlag = 0;
+    else if (teclahex == LCTRL /*|| teclahex == RCTRL*/)
+        ctrlFlag = 1;
+    else if (teclahex == LCTRL+RELEASE /*|| teclahex == RCTRL+RELEASE*/)
+        ctrlFlag = 0;
+    else if (ctrlFlag)
+        ctrlAction(teclahex, rsp);
+    else if (shiftFlag) { //si es algo imprimible (no de retorno)
         if(teclahex < RELEASE && isPrintable(shift_kbd_US[teclahex]))
             loadInBuffer(teclahex);
     }
@@ -157,7 +143,21 @@ void keyboard_handler(){
     }
 }
 
-char get_char(){
+//si llegue al final del buffer no sigo imprimiendo
+void loadInBuffer(char c){
+    
+        buffer[write_i++] = c;
+        if( write_i == BUFFER_LENGTH){
+            write_i = 0;                // overflow protection
+        }
+        read_i++;
+        if(read_i == BUFFER_LENGTH){
+            read_i = 0;
+        }
+    
+}
+
+char getChar(){
     char c = 0;
     c = removeFromBuffer();
     if(c=='\b'){
@@ -173,17 +173,17 @@ char get_char(){
 }
 
 void cleanBuffer(){
-    size = write_i = read_i = 0;
+    write_i = read_i = 0;
 }
 int bufferSize(){
-    return size;
+    return write_i;
 }
 char removeFromBuffer(){
-    if(size <= 0){
+    if(write_i <= 0){
         return -1;          //empty buffer
     }
     
-    size--;
+    write_i--;
     char c = buffer[read_i];
     read_i = (read_i + 1) % BUFFER_LENGTH;
     return c;
