@@ -5,6 +5,7 @@
 #include <idtLoader.h>
 #include <console.h>
 #include <naiveConsole.h>
+#include <keyboard.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -103,8 +104,11 @@ int main()
 	ncNewline();
 
 	ncPrint("[Finished]");
-	ncClear();
 
-	while(1);
+	int c;
+	while ((c = getChar())) {
+		printChar(STDOUT, c);
+	}
+
 	return 0;
 }

@@ -18,22 +18,18 @@ uint64_t* getRegisters(){
     return 0; //??
 }
 
-
 void syscallHandler(uint8_t rax, void* arg0, void* arg1, void* arg2) {
     switch (rax) {
         case WRITE:
-            sys_write((FILE_DESCRIPTOR)arg0, (char *)arg1, (size_t)arg2);
+            print((uint8_t)arg0, (char *)arg1, (size_t)arg2);
         break;
     }
     return;
 }
 
-void sys_write(FILE_DESCRIPTOR fd, char* string, size_t count) {
-    print(fd, string, count);
-}
-
 uint64_t sys_read(){
     getChar();
+    return 0;
 }
 
 /*void * int_80(uint8_t argc, void * argv[] ) { }*/
