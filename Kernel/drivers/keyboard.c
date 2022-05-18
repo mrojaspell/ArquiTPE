@@ -21,7 +21,8 @@ static char charTable[58][2] = {
 //estas tablas de abajo las dejamos por las dudas pero borrar al final del trabajo    
 static char kbd_US [128] =
         {
-                0,  27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b',
+                0,  0, /* <-- esc */
+                '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b',
                 '\t', /* <-- Tab */
                 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n',
                 0, /* <-- control key */
@@ -56,7 +57,8 @@ static char kbd_US [128] =
 
 static char shift_kbd_US [128] =
         {
-                0,  27, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '\b',
+                0,  0, /* <-- esc */
+                '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '\b',
                 '\t', /* <-- Tab */
                 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n',
                 0, /* <-- control key */
@@ -106,8 +108,8 @@ void ctrlAction(uint8_t teclahex, uint64_t rsp){
 }
 
 //para que no printee cosas raras cuando toco una tecla no imprimible como el control
-int isPrintable(uint8_t c){
-    return ((c>= 32 && c<=126) || (c == BACKSPACE) || (c == ENTER)); //esos son los numeros imprimibles en la tabla ascii
+int isPrintable(uint8_t teclahex){
+    return teclahex >= RELEASE && kbd_US[teclahex] != 0; //esos son los numeros imprimibles en la tabla ascii
 }
 
 void keyboardHandler(uint64_t rsp){
@@ -127,9 +129,9 @@ void keyboardHandler(uint64_t rsp){
         ctrlFlag = 0;
     else if (ctrlFlag && teclahex < RELEASE)
         ctrlAction(teclahex, rsp);
-    else if (shiftFlag && isPrintable(shift_kbd_US[teclahex])) //si es algo imprimible (no de retorno)
+    else if (shiftFlag && isPrintable(teclahex)) //si es algo imprimible (no de retorno)
         loadInBuffer(shift_kbd_US[teclahex]);
-    else if (isPrintable(kbd_US[teclahex]))
+    else if (isPrintable(teclahex))
             loadInBuffer(kbd_US[teclahex]);
 }
 
