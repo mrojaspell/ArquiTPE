@@ -87,9 +87,11 @@ void initializeDualScreen() {
 
 void deleteChar(FILE_DESCRIPTOR fd) {
   if(windows[fd].currPos.x == windows[fd].start.x){        
-        windows[fd].currPos.y -= 1;                               
-        windows[fd].currPos.x = windows[fd].width-1;
-        printCharColor(fd, ' ', WHITE, BLACK, 0);
+        if (windows[fd].currPos.y > windows[fd].start.y) {
+          windows[fd].currPos.y -= 1;                               
+          windows[fd].currPos.x = windows[fd].width-1;
+          printCharColor(fd, ' ', WHITE, BLACK, 0);
+        }
   } else {
     windows[fd].currPos.x = (windows[fd].currPos.x-1) % windows[fd].width;
     printCharColor(fd, ' ', WHITE, BLACK, 0);

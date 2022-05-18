@@ -31,6 +31,18 @@ void ncNewline()
 	while((uint64_t)(currentVideo - video) % (width * 2) != 0);
 }
 
+void debug(char *str) {
+	uint8_t* pos = video + width * 2 * (height - 1);
+	for (int i = 0; str[i] != '\0'; i += 1) {
+		*(pos + i * 2) = str[i];
+	}
+}
+
+void debugBase(uint64_t value, uint32_t base) {
+	uintToBase(value, buffer, base);
+	debug(buffer);
+}
+
 void ncPrintDec(uint64_t value)
 {
 	ncPrintBase(value, 10);

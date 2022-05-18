@@ -106,7 +106,9 @@ int main()
 	ncPrint("[Finished]");
 
 	int c;
-	while ((c = getChar())) {
+	while (1) {
+		int c = getChar();
+		if (c == '\n') debug("hoolaaa");
 		printChar(STDOUT, c);
 	}
 

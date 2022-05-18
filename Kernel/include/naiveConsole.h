@@ -11,5 +11,6 @@ void ncPrintHex(uint64_t value);
 void ncPrintBin(uint64_t value);
 void ncPrintBase(uint64_t value, uint32_t base);
 void ncClear();
-
+void debug(char *str);
+void debugBase(uint64_t value, uint32_t base);
 #endif
