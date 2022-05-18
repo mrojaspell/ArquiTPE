@@ -1,11 +1,12 @@
-GLOBAL cpuVendor
-GLOBAL getKey
-GLOBAL hasKey
-GLOBAL getRTCInfo
+GLOBAL _cpuVendor
+GLOBAL _getKey
+GLOBAL _hasKey
+GLOBAL _getRTCInfo
+GLOBAL _getMem
 
 section .text
 	
-cpuVendor:
+_cpuVendor:
 	push rbp
 	mov rbp, rsp
 
@@ -30,7 +31,7 @@ cpuVendor:
 	ret
 
 ; devuelve 1 si hay una tecla y cero sino
-hasKey:
+_hasKey:
     push rbp
     mov rbp, rsp
 
@@ -42,7 +43,7 @@ hasKey:
     pop rbp
     ret
 
-getKey:
+_getKey:
     push rbp
     mov rbp, rsp
     mov rax,0 ;limpio el registro
@@ -54,7 +55,7 @@ getKey:
     ret
 
 
-getRTCInfo:
+_getRTCInfo:
     push rbp
     mov rbp,rsp
 
@@ -65,3 +66,13 @@ getRTCInfo:
 
     leave
     ret
+
+
+_getMem:
+    push rbp
+	mov rbp,rsp
+
+	mov al, byte[rdi]       ; recibo la direccion que quiero por rdi y devuelvo el byte por al
+
+	leave
+	ret

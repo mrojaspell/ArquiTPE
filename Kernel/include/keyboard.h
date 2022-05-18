@@ -17,8 +17,8 @@
 #define ENDKEY 79
 #define BUFFER_LENGTH 256
 
-extern uint8_t getKey(); //en libasm.asm
-extern uint8_t hasKey();
+extern uint8_t _getKey(); //en libasm.asm
+extern uint8_t _hasKey();
 
 //busca el numero de caracter en mi array y lo imprime
 void printKey(uint8_t key);

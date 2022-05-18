@@ -3,19 +3,30 @@
 #include <registerNames.h>
 #include <console.h>
 
+static uint64_t registerss[16] = {0};  // comienzan en 0 por default (mas entendible que no tienen nada guardado)
 
-// static uint64_t regs[16] = {0};
 
 
 uint8_t getCurrentTime(uint64_t rtcID){
-	uint8_t x = getRTCInfo(rtcID);
+	uint8_t x = _getRTCInfo(rtcID);
 	uint8_t result = ((x / 16) * 10) + (x & 0xf);
 	return result;
 }
 
-uint64_t* getRegisters(){
-    // return registers;
-    return 0; //??
+void getRegisterData(uint64_t* rsp){
+    for(int i =0 ; i < REGISTERS ; i++){
+        registers[i] = rsp[i];
+    }
+}
+
+uint64_t* infoReg(){
+    return regiters;
+}
+
+void printMem(uint64_t direc; uint8_t * buffer, uint64_t bytes){
+    for (uint8_t i = 0; i < bytes; i++) {
+        buffer[i] = (uint8_t) _getMem(direc+i);     // llamo 'bytes'(32) veces a _getMem con 32 posiciones de memoria distintos
+    }
 }
 
 void syscallHandler(uint8_t rax, void* arg0, void* arg1, void* arg2) {

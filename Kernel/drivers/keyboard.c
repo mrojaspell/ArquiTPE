@@ -100,10 +100,9 @@ static uint16_t read_i = 0;
 static uint16_t write_i = 0;
 static int overflow = 0; // necesario para chequear que read_i sea menor que write_i ciclicamente
 
-void ctrlAction(uint8_t teclahex, uint64_t rsp){
-    uint8_t key = kbd_US[teclahex];
+void ctrlAction(uint8_t key, uint64_t rsp){
     if(key == 'r'){
-        // registerSnapshot((uint64_t*) rsp);
+        getRegisterData((uint64_t*) rsp);
     }
 }
 
@@ -115,10 +114,10 @@ int isPrintable(uint8_t teclahex){
 void keyboardHandler(uint64_t rsp){
 
     static uint8_t teclahex; //quiero que mantengan sus valores
-    if (!hasKey())
+    if (!_hasKey())
         return;
     
-    teclahex = getKey();
+    teclahex = _getKey();
     debugBase(teclahex, 10);
     if (teclahex == RSHIFT || teclahex == LSHIFT) //si toco shift
         shiftFlag = 1;
@@ -129,7 +128,7 @@ void keyboardHandler(uint64_t rsp){
     else if (teclahex == LCTRL+RELEASE /*|| teclahex == RCTRL+RELEASE*/)
         ctrlFlag = 0;
     else if (ctrlFlag && teclahex < RELEASE)
-        ctrlAction(teclahex, rsp);
+        ctrlAction(kbd_US[teclahex], rsp);
     else if (shiftFlag && isPrintable(teclahex)) //si es algo imprimible (no de retorno)
         loadInBuffer(shift_kbd_US[teclahex]);
     else if (isPrintable(teclahex))
