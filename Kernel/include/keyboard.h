@@ -8,8 +8,8 @@
 
 #define MAXCHARACTERS 25*80
 #define RELEASE 128 //el offset entre el codigo de una tecla y el codigo del release de esa tecla
-#define BACKSPACE '\b'
-#define ENTER '\n'
+#define BACKSPACE 14
+#define ENTER 28
 #define LSHIFT 42
 #define RSHIFT 54
 #define LCTRL 29

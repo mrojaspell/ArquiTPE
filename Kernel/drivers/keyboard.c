@@ -125,21 +125,14 @@ void keyboardHandler(uint64_t rsp){
         ctrlFlag = 1;
     else if (teclahex == LCTRL+RELEASE /*|| teclahex == RCTRL+RELEASE*/)
         ctrlFlag = 0;
-    else if (ctrlFlag)
+    else if (ctrlFlag && teclahex < RELEASE)
         ctrlAction(teclahex, rsp);
-    else if (shiftFlag) { //si es algo imprimible (no de retorno)
-        if(teclahex < RELEASE && isPrintable(shift_kbd_US[teclahex]))
-            loadInBuffer(shift_kbd_US[teclahex]);
-    }
-    else{
-        if (teclahex < RELEASE && isPrintable(kbd_US[teclahex]))
-            {
-                loadInBuffer(kbd_US[teclahex]);
-            }
-    }
+    else if (shiftFlag && isPrintable(shift_kbd_US[teclahex])) //si es algo imprimible (no de retorno)
+        loadInBuffer(shift_kbd_US[teclahex]);
+    else if (isPrintable(kbd_US[teclahex]))
+            loadInBuffer(kbd_US[teclahex]);
 }
 
-//si llegue al final del buffer no sigo imprimiendo
 void loadInBuffer(char c){
     // write_i puede seguir escribiendo incluso wrappeando al menos que llegue al read_i
     if (!overflow || write_i < read_i) {
@@ -153,17 +146,25 @@ void loadInBuffer(char c){
 
 char getChar(){
     char c = 0;
+
+    do{
+        c = removeFromBuffer();
+    } while (c == -1);
+    
+    /*
     c = removeFromBuffer();
     while(c==-1){
         showCursor(STDOUT);
         _hlt();
          c=removeFromBuffer();
     }
-    stopCursor(STDOUT);
+    stopCursor(STDOUT);*/
+
     return c;
 }
 
 void cleanBuffer(){
+    overflow = 0;
     write_i = read_i = 0;
 }
 int bufferSize(){
@@ -173,11 +174,11 @@ int bufferSize(){
 char removeFromBuffer(){
     // Si hay overflow significa que el write_i ya overfloweo una vez, osea hay mas caracteres
     if(overflow || read_i < write_i){
-        char c = buffer[read_i];
+        char c = buffer[read_i++];
         if (read_i == BUFFER_LENGTH) {
             overflow = 0;
+            read_i = 0;
         }
-        read_i = (read_i + 1) % BUFFER_LENGTH;
         return c;
     }
     

@@ -136,7 +136,7 @@ void goNextPosition(window* win) {
 
 void showCursor(FILE_DESCRIPTOR fd) {
   int change = 0;
-  if (!change && ticks_elapsed() % 9) {
+  if (!change && (ticks_elapsed() % 9 == 0)) {
     change = 1;
     printCharColor(fd, '_', WHITE, BLACK, 0);
     if (ticks_elapsed() % 18 == 0) {
