@@ -3,7 +3,7 @@
 #include <registerNames.h>
 #include <console.h>
 
-static uint64_t registerss[16] = {0};  // comienzan en 0 por default (mas entendible que no tienen nada guardado)
+static uint64_t registers[16] = {0};  // comienzan en 0 por default (mas entendible que no tienen nada guardado)
 
 
 
@@ -20,10 +20,10 @@ void getRegisterData(uint64_t* rsp){
 }
 
 uint64_t* infoReg(){
-    return regiters;
+    return registers;
 }
 
-void printMem(uint64_t direc; uint8_t * buffer, uint64_t bytes){
+void printMem(uint64_t direc, uint8_t * buffer, uint64_t bytes){
     for (uint8_t i = 0; i < bytes; i++) {
         buffer[i] = (uint8_t) _getMem(direc+i);     // llamo 'bytes'(32) veces a _getMem con 32 posiciones de memoria distintos
     }
