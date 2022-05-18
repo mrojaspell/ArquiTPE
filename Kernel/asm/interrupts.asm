@@ -141,15 +141,8 @@ _irq05Handler:
 	irqHandlerMaster 5
 
 _irq80Handler:
-	push rbp
-    mov rbp, rsp
-	mov rcx, rdx 
-	mov rdx, rsi
-	mov rsi, rdi
-	mov rdi, rax
 	call syscallHandler
-	leave
-	ret
+	iretq
 
 
 ;Zero Division Exception

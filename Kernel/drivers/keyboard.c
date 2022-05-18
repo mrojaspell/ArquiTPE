@@ -151,6 +151,7 @@ char getChar(){
 
     do{
         c = removeFromBuffer();
+        _hlt();
     } while (c == -1);
     
     /*

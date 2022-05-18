@@ -116,7 +116,7 @@ void printCharColor(FILE_DESCRIPTOR fd, char c, color_t charColor, color_t bgCol
   
   uint8_t* current = getPosition(windows[fd].currPos.y, windows[fd].currPos.x);
   *(current) = c;
-  *(current + 1) = (fd == STDERR) ? ((BLACK << 4) | RED) : ((bgColor << 4) | charColor);
+  *(current + 1) = ((bgColor << 4) | charColor);
   
   if (next) {
     goNextPosition(&(windows[fd]));

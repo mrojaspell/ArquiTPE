@@ -91,10 +91,6 @@ int main()
 	ncPrint("  Sample code module at 0x");
 	ncPrintHex((uint64_t)sampleCodeModuleAddress);
 	ncNewline();
-	ncPrint("  Calling the sample code module returned: ");
-	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
-	ncNewline();
-	ncNewline();
 
 	ncPrint("  Sample data module at 0x");
 	ncPrintHex((uint64_t)sampleDataModuleAddress);
@@ -103,14 +99,10 @@ int main()
 	ncPrint((char*)sampleDataModuleAddress);
 	ncNewline();
 
-	ncPrint("[Finished]");
-	clearScreen(STDOUT);
+	ncPrint("Press enter to log in\n");
 	int c;
-	while (1) {
-		int c = getChar();
-		debugBase(c, 10);
-		printChar(STDOUT, c);
-	}
-
+	while((c = getChar()) != '\n');
+	
+  ((EntryPoint)sampleCodeModuleAddress)();
 	return 0;
 }
