@@ -109,7 +109,7 @@ void ctrlAction(uint8_t teclahex, uint64_t rsp){
 
 //para que no printee cosas raras cuando toco una tecla no imprimible como el control
 int isPrintable(uint8_t teclahex){
-    return teclahex >= RELEASE && kbd_US[teclahex] != 0; //esos son los numeros imprimibles en la tabla ascii
+    return teclahex < RELEASE && kbd_US[teclahex] != 0; //esos son los numeros imprimibles en la tabla ascii
 }
 
 void keyboardHandler(uint64_t rsp){
@@ -119,6 +119,7 @@ void keyboardHandler(uint64_t rsp){
         return;
     
     teclahex = getKey();
+    debugBase(teclahex, 10);
     if (teclahex == RSHIFT || teclahex == LSHIFT) //si toco shift
         shiftFlag = 1;
     else if (teclahex == RSHIFT+RELEASE || teclahex == LSHIFT+RELEASE) //si antes habia tocado shift y ahora toque una letra

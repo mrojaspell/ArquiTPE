@@ -104,11 +104,11 @@ int main()
 	ncNewline();
 
 	ncPrint("[Finished]");
-
+	clearScreen(STDOUT);
 	int c;
 	while (1) {
 		int c = getChar();
-		if (c == '\n') debug("hoolaaa");
+		debugBase(c, 10);
 		printChar(STDOUT, c);
 	}
 
