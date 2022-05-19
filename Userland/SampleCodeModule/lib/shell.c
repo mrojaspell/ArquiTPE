@@ -3,10 +3,23 @@
 #include <ctype.h>
 
 #define BUFFER_LENGTH 256
-#define COMMANDS_LENGTH 1
+#define COMMANDS_LENGTH 2
+
 void holaMundo() {
   _fprintf(STDOUT, "hola mundo %s", "hola");
   return 0;
+}
+
+void help(){
+  _fprint(STDOUT, "Lista de posibles comandos: \n");
+  for (uint8_t i = 0; i < COMMANDS_LENGTH; i++){
+    _fprintf(STDOUT, "\t%s\n", commands[i].name);
+  }
+}
+
+void infoReg(){
+  static uint64_t registers[16]; //despues arreglar tamanio
+  sys_inforeg(registers, (sizeof(registers)/sizeof(registers[0])));
 }
 
 /*
@@ -16,7 +29,9 @@ void holaMundo() {
    void (*runner)();  FUNCION A CORRER
  } 
 */
-static command commands[COMMANDS_LENGTH] = {{ "hello", &holaMundo }};
+
+//ponerlos en orden alfabetico plssssssss
+static command commands[COMMANDS_LENGTH] = {{ "hello", &holaMundo }, { "help", &help }, { "inforeg", &infoReg }};
 
 // recibe una linea de commando y te devuelve si es ese commando o no
 int isCommand(const char* commandLine, const char* command) {
@@ -34,20 +49,19 @@ int isCommand(const char* commandLine, const char* command) {
   return command[c_i] == '\0' && (commandLine[cl_i] == ' ' || commandLine[cl_i] == '\n' || commandLine[cl_i] == '\0');
 }
 
+
 char* getCommand() {
   static char buffer[BUFFER_LENGTH];
 
   int c;
   int i = 0;
   while ((c = getChar()) != '\n') {
-    if (c != '\b') {
+    if (c != '\b' && i < BUFFER_LENGTH - 1) {
       buffer[i++] = c;
       _putc(STDOUT, c);
-    } else {
-      if (i > 0) {
+    } else if (i > 0) {
         i--;
         _putc(STDOUT, '\b');
-      }
     }
   }
   buffer[i] = '\0';
@@ -60,7 +74,7 @@ void runCommand(const char *str) {
       return commands[i].runner();
     }
   }
-  fprint(STDOUT, "Este commando no es valido");
+  fprint(STDOUT, "Este comando no es valido");
   return 0;
 }
 

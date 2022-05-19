@@ -11,3 +11,7 @@ int sys_write(uint8_t fd, const char *buffer, size_t count) {
 int sys_clear(uint8_t fd) {
     return _syscall(2, fd, 0, 0);
 }
+
+int sys_inforeg(uint64_t *buffer, size_t count){
+  return _syscall(3, NULL, buffer, count);
+}

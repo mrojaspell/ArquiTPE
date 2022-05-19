@@ -4,7 +4,8 @@
 #include <console.h>
 #include <naiveConsole.h>
 
-static uint64_t registers[16] = {0};  // comienzan en 0 por default (mas entendible que no tienen nada guardado)
+//creo que esta al pedo, si funciona todo lo borro
+//static uint64_t registers[REGISTERS] = {0};  // comienzan en 0 por default (mas entendible que no tienen nada guardado)
 
 uint8_t getCurrentTime(uint64_t rtcID){
 	uint8_t x = _getRTCInfo(rtcID);
@@ -12,14 +13,15 @@ uint8_t getCurrentTime(uint64_t rtcID){
 	return result;
 }
 
-void getRegisterData(uint64_t* rsp){
-    for(int i =0 ; i < REGISTERS ; i++){
-        registers[i] = rsp[i];
-    }
-}
+int sys_inforeg(uint64_t* rsp, uint64_t *buffer, size_t count){
+    if(buffer == NULL || count < REGISTERS*sizeof(uint64_t))
+        return -1;
 
-uint64_t* infoReg(){
-    return registers;
+    for(int i = 0 ; i < REGISTERS ; i++){
+        buffer[i] = rsp[i];
+    }
+
+    return 0;
 }
 
 void printMem(uint64_t direc, uint8_t * buffer, uint64_t bytes){
@@ -53,7 +55,7 @@ int sys_write(FILE_DESCRIPTOR fd, const char* buffer, uint64_t size) {
     return i;
 }
 
-int syscallHandler(syscall_id rax, void* arg0, void* arg1, void* arg2) {
+int syscallHandler(uint64_t rsp, syscall_id rax, void* arg0, void* arg1, void* arg2) {
     switch (rax) {
         case READ:
             return sys_read((FILE_DESCRIPTOR)arg0, (char *)arg1, (size_t)arg2);
@@ -62,6 +64,8 @@ int syscallHandler(syscall_id rax, void* arg0, void* arg1, void* arg2) {
         case CLEAN_SCREEN:
             clearScreen((FILE_DESCRIPTOR)arg0);
             return 0;
+        case INFOREG:
+            return sys_inforeg(rsp, (uint64_t *)arg1, (size_t) arg2)
     }
     return -1;
 }
