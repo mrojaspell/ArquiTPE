@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 typedef enum {
-  READ=0, WRITE, CLEAN_SCREEN, INFOREG
+  READ=0, WRITE, CLEAN_SCREEN, INFOREG, DATENTIME
 } syscall_id;
 
 #define REGISTERS 16

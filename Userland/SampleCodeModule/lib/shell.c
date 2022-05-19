@@ -2,6 +2,7 @@
 #include <shell.h>
 #include <ctype.h>
 #include <usersyscalls.h>
+#include <RTCID.h>
 
 #define BUFFER_LENGTH 256
 #define COMMANDS_LENGTH 3
@@ -14,13 +15,27 @@
    void (*runner)();  FUNCION A CORRER
  } 
 */
+void dateAndTime();
 void help();
 void infoReg();
 void holaMundo();
 
 //ponerlos en orden alfabetico plssssssss
-static command commands[COMMANDS_LENGTH] = {{ "hello", &holaMundo }, { "help", &help }, { "inforeg", &infoReg }};
+static command commands[COMMANDS_LENGTH] = {{"date&time", &dateAndTime}, { "hello", &holaMundo }, { "help", &help }, { "inforeg", &infoReg }};
 
+
+void dateAndTime(){
+  _fprint(STDOUT, "La fecha de hoy es: ");
+  uint64_t date = sys_dateAndTime(DAY_RTC_ID);    // por lo que entendi estamos haciendo que las syscalls solo llamen a la sys call por lo que implemento todo los prints aca
+  uint64_t month = sys_dateAndTime(MONTH_RTC_ID);    // si no es asi se puede cambiar rapidamente
+  uint64_t year = sys_dateAndTime(YEAR_RTC_ID);
+  _fprint(STDOUT, date); _fprint(STDOUT, month); _fprint(STDOUT, year); // corregir cuando se implemente correctamente printf
+  _fprint(STDOUT,"\n Y el horario de este momento es: "); // esto es solo un modelo 
+  uint64_t hour = sys_dateAndTime(HOUR_RTC_ID);
+  uint64_t minute = sys_dateAndTime(MINUTE_RTC_ID);
+  uint64_t second = sys_dateAndTime(SECOND_RTC_ID);
+  // print la hora minuto segundo hasta que no implementewmos bien los prints no lo voy a escribir
+}
 
 void help(){
   _fprint(STDOUT, "Lista de posibles comandos: \n");
@@ -33,7 +48,7 @@ void help(){
 }
 
 void infoReg(){
-  static uint64_t registers[16]; //despues arreglar tamanio
+  static uint64_t registers[16]; //despues arreglar tamaño
   sys_inforeg(registers, (sizeof(registers)/sizeof(registers[0])));
 }
 

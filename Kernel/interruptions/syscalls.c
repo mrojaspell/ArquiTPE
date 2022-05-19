@@ -7,7 +7,7 @@
 //creo que esta al pedo, si funciona todo lo borro
 //static uint64_t registers[REGISTERS] = {0};  // comienzan en 0 por default (mas entendible que no tienen nada guardado)
 
-uint8_t getCurrentTime(uint64_t rtcID){
+uint8_t sys_dateNTime(uint64_t rtcID){
 	uint8_t x = _getRTCInfo(rtcID);
 	uint8_t result = ((x / 16) * 10) + (x & 0xf);
 	return result;
@@ -66,6 +66,8 @@ int syscallHandler(syscall_id rax, void* arg0, void* arg1, void* arg2) {
             return 0;
         case INFOREG:
             return sys_inforeg((uint64_t *)arg1, (size_t) arg2);
+        case DATENTIME:
+            return sys_dateNTime((uint64_t*) arg0);
     }
     return -1;
 }
