@@ -102,7 +102,7 @@ static int overflow = 0; // necesario para chequear que read_i sea menor que wri
 
 void ctrlAction(uint8_t key, uint64_t rsp){
     if(key == 'r'){
-        getRegisterData((uint64_t*) rsp);
+        //getRegisterData((uint64_t*) rsp);
     }
 }
 

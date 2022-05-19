@@ -141,9 +141,9 @@ _irq05Handler:
 	irqHandlerMaster 5
 
 _irq80Handler:
-	push rsp ;cambiar a pasaje de parametros por registros
+	;push rsp ;cambiar a pasaje de parametros por registros
 	call syscallHandler
-	add rsp, 8 ;saco el rsp viejo del stack
+	;add rsp, 8 ;saco el rsp viejo del stack
 	iretq
 
 

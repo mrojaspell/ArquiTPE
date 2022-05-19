@@ -3,7 +3,9 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/Userland/SampleCodeModule/include",
+                "${workspaceFolder}/Kernel/include"
             ],
             "defines": [
                 "_DEBUG",

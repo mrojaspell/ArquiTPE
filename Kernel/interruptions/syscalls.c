@@ -13,12 +13,12 @@ uint8_t getCurrentTime(uint64_t rtcID){
 	return result;
 }
 
-int sys_inforeg(uint64_t* rsp, uint64_t *buffer, size_t count){
+int sys_inforeg(uint64_t *buffer, size_t count){
     if(buffer == NULL || count < REGISTERS*sizeof(uint64_t))
         return -1;
 
     for(int i = 0 ; i < REGISTERS ; i++){
-        buffer[i] = rsp[i];
+        //buffer[i] = rsp[i];
     }
 
     return 0;
@@ -55,7 +55,7 @@ int sys_write(FILE_DESCRIPTOR fd, const char* buffer, uint64_t size) {
     return i;
 }
 
-int syscallHandler(uint64_t rsp, syscall_id rax, void* arg0, void* arg1, void* arg2) {
+int syscallHandler(syscall_id rax, void* arg0, void* arg1, void* arg2) {
     switch (rax) {
         case READ:
             return sys_read((FILE_DESCRIPTOR)arg0, (char *)arg1, (size_t)arg2);
@@ -65,7 +65,7 @@ int syscallHandler(uint64_t rsp, syscall_id rax, void* arg0, void* arg1, void* a
             clearScreen((FILE_DESCRIPTOR)arg0);
             return 0;
         case INFOREG:
-            return sys_inforeg(rsp, (uint64_t *)arg1, (size_t) arg2)
+            return sys_inforeg((uint64_t *)arg1, (size_t) arg2);
     }
     return -1;
 }
