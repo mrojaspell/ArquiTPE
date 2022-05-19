@@ -110,8 +110,13 @@ void printCharColor(FILE_DESCRIPTOR fd, char c, color_t charColor, color_t bgCol
 
   // Newline
   if(c == '\n'){
-      newLine(fd);
-      return;
+    newLine(fd);
+    return;
+  }
+
+  if (c == '\t') {
+    for (int i = 0; i < 2; i += 1) printCharColor(fd, ' ', charColor, bgColor, 1);
+    return;
   }
   
   uint8_t* current = getPosition(windows[fd].currPos.y, windows[fd].currPos.x);

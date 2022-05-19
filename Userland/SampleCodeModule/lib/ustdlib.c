@@ -9,7 +9,7 @@ int _strlen(const char* str) {
   return i;
 }
 
-void fprint(uint8_t fd, const char* str) {
+void _fprint(uint8_t fd, const char* str) {
   for (int i = 0; str[i] != '\0'; i += 1) {
     _putc(fd, str[i]);
   }
@@ -49,19 +49,19 @@ void _fprintf(uint8_t fd, char* format, ...)
                             i = -i;
                             _putc(fd, '-'); 
                         } 
-                        fprint(fd, convert(i,10));
+                        _fprint(fd, convert(i,10));
                         break; 
 
             case 'o': i = va_arg(arg,unsigned int); //Fetch Octal representation
-                        fprint(fd, convert(i,8));
+                        _fprint(fd, convert(i,8));
                         break; 
 
             case 's': s = va_arg(arg,char *);       //Fetch string
-                        fprint(fd, s); 
+                        _fprint(fd, s); 
                         break; 
 
             case 'x': i = va_arg(arg,unsigned int); //Fetch Hexadecimal representation
-                        fprint(fd, convert(i,16));
+                        _fprint(fd, convert(i,16));
                         break; 
         }   
     } 

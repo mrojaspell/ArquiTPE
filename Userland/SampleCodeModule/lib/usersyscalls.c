@@ -5,7 +5,7 @@ int sys_read(uint8_t fd, char *buffer, size_t count) {
 }
 
 int sys_write(uint8_t fd, const char *buffer, size_t count) {
-    return _syscall(1, fd, buffer, count);
+    return _syscall(1, fd, (uint64_t)buffer, count);
 }
 
 int sys_clear(uint8_t fd) {
@@ -13,5 +13,5 @@ int sys_clear(uint8_t fd) {
 }
 
 int sys_inforeg(uint64_t *buffer, size_t count){
-  return _syscall(3, NULL, buffer, count);
+  return _syscall(3, 0, (uint64_t)buffer, count);
 }

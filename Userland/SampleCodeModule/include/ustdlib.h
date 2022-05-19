@@ -11,7 +11,7 @@ enum {
 
 #define IS_DIGIT(x) (((x) >= '0' && (x) <= '9'))
 void clear_screen(unsigned int fd);
-void fprint(uint8_t fd, const char *str);
+void _fprint(uint8_t fd, const char *str);
 int getChar();
 void _putc(uint8_t fd, char c);
 void _fprintf(uint8_t fd, char *,...);              

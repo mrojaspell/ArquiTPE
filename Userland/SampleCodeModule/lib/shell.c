@@ -1,26 +1,11 @@
 #include <ustdlib.h>
 #include <shell.h>
 #include <ctype.h>
+#include <usersyscalls.h>
 
 #define BUFFER_LENGTH 256
-#define COMMANDS_LENGTH 2
+#define COMMANDS_LENGTH 3
 
-void holaMundo() {
-  _fprintf(STDOUT, "hola mundo %s", "hola");
-  return 0;
-}
-
-void help(){
-  _fprint(STDOUT, "Lista de posibles comandos: \n");
-  for (uint8_t i = 0; i < COMMANDS_LENGTH; i++){
-    _fprintf(STDOUT, "\t%s\n", commands[i].name);
-  }
-}
-
-void infoReg(){
-  static uint64_t registers[16]; //despues arreglar tamanio
-  sys_inforeg(registers, (sizeof(registers)/sizeof(registers[0])));
-}
 
 /*
  Lista de comandos y su estructura
@@ -29,9 +14,33 @@ void infoReg(){
    void (*runner)();  FUNCION A CORRER
  } 
 */
+void help();
+void infoReg();
+void holaMundo();
 
 //ponerlos en orden alfabetico plssssssss
 static command commands[COMMANDS_LENGTH] = {{ "hello", &holaMundo }, { "help", &help }, { "inforeg", &infoReg }};
+
+
+void help(){
+  _fprint(STDOUT, "Lista de posibles comandos: \n");
+  for (uint8_t i = 0; i < COMMANDS_LENGTH; i++){
+    // _fprintf(STDOUT, "\t%s\n", commands[i].name); CORREGIR fprintf
+    _fprint(STDOUT, "\t");
+    _fprint(STDOUT, commands[i].name);
+    _fprint(STDOUT, "\n");
+  }
+}
+
+void infoReg(){
+  static uint64_t registers[16]; //despues arreglar tamanio
+  sys_inforeg(registers, (sizeof(registers)/sizeof(registers[0])));
+}
+
+void holaMundo() {
+  _fprintf(STDOUT, "hola mundoss %s", "hola");
+  return;
+}
 
 // recibe una linea de commando y te devuelve si es ese commando o no
 int isCommand(const char* commandLine, const char* command) {
@@ -74,8 +83,8 @@ void runCommand(const char *str) {
       return commands[i].runner();
     }
   }
-  fprint(STDOUT, "Este comando no es valido");
-  return 0;
+  _fprint(STDOUT, "Este comando no es valido");
+  return;
 }
 
 void initShell() {
