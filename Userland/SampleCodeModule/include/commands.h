@@ -1,6 +1,6 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
-#define COMMANDS_LENGTH 5
+#define COMMANDS_LENGTH 7
 #define DUMP_SIZE 32
 
 typedef struct {
@@ -18,10 +18,16 @@ command* getCommands(int* size);
    void (*runner)();  FUNCION A CORRER
  } 
 */
+
+extern int _opcodeExp();
+
 void dateAndTime();
 void help();
 void infoReg();
 void holaMundo();
-void printmem(char address);
+void printmem(char* address);
+void divZero();
+void invalidOpcode();
+
 
 #endif

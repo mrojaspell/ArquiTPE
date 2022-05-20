@@ -6,14 +6,27 @@
 
 static command commands[COMMANDS_LENGTH] = {
   { "date&time", &dateAndTime, "Imprime la fecha y el horario."}, 
+  { "divZero", &divZero, "Genera una excepción de dividir por 0"},
   { "hello", &holaMundo, "Saluda al mundo." }, 
   { "help", &help, "Muestra una lista de los comandos." }, 
   { "inforeg", &infoReg, "Imprime los registros con sus valores al llamar esta función." },
+  { "invalidOpcode", &invalidOpcode, "Genera una excepción de operador invalido"},
   { "printmem", &printmem, "Volcado de memoria de 32 bytes a partir de la dirección recibida como  argumento."},
 };
 
-void printmem(char address){
-  uint64_t memDir = strToHex(&address);
+void divZero(){
+  int aux1 = 1;
+  int aux2 = 0;
+  int div0 = aux1/aux2;
+  return;
+}
+
+void invalidOpcode(){
+  _opcodeExp();
+}
+
+void printmem(char* address){
+  uint64_t memDir = strToHex(address);
 	if(memDir == -1){
     _fprintf(STDOUT,"\nLa direccion ingresada no es alcanzable (%s)",address);
     return;
@@ -46,7 +59,7 @@ void dateAndTime(){
 void help(){
   _fprint(STDOUT, "Lista de posibles comandos: \n");
   for (uint8_t i = 0; i < COMMANDS_LENGTH; i++){
-    _fprintf(STDOUT, "\t%s\n", commands[i].name); //CORREGIR fprintf
+    _fprintf(STDOUT, "\t%s\n", commands[i].name);
   }
 }
 

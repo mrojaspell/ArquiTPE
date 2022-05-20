@@ -4,8 +4,6 @@
 #include <console.h>
 #include <naiveConsole.h>
 
-//creo que esta al pedo, si funciona todo lo borro
-//static uint64_t registers[REGISTERS] = {0};  // comienzan en 0 por default (mas entendible que no tienen nada guardado)
 
 uint8_t sys_dateAndTime(uint64_t rtcID){
 	uint8_t x = _getRTCInfo(rtcID);
@@ -13,12 +11,12 @@ uint8_t sys_dateAndTime(uint64_t rtcID){
 	return result;
 }
 
-int sys_inforeg(uint64_t *buffer, size_t count){
+int sys_inforeg(uint64_t *buffer, size_t count, uint64_t* rsp){
     if(buffer == NULL || count < REGISTERS*sizeof(uint64_t))
         return -1;
 
-    for(int i = 0 ; i < REGISTERS ; i++){
-        //buffer[i] = rsp[i];
+    for(int i = 0 ; i < REGISTERS ; i++){ //buffer[0] = r15, ... buffer[15] = rax
+        buffer[i] = rsp[i];
     }
 
     return 0;
@@ -55,7 +53,7 @@ int sys_write(FILE_DESCRIPTOR fd, const char* buffer, uint64_t size) {
     return i;
 }
 
-int syscallHandler(syscall_id rax, void* arg0, void* arg1, void* arg2) {
+int syscallHandler(syscall_id rax, void* arg0, void* arg1, void* arg2, uint64_t* rsp) {
     switch (rax) {
         case SYS_READ:
             return sys_read((FILE_DESCRIPTOR)arg0, (char *)arg1, (size_t)arg2);
@@ -68,7 +66,7 @@ int syscallHandler(syscall_id rax, void* arg0, void* arg1, void* arg2) {
             return 0;
             break;
         case SYS_INFOREG:
-            return sys_inforeg((uint64_t *)arg1, (size_t) arg2);
+            return sys_inforeg((uint64_t *)arg1, (size_t) arg2, rsp);
             break;
         case SYS_DATENTIME:
             return sys_dateAndTime((uint64_t) arg0);

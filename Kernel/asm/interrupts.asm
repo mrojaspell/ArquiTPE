@@ -40,6 +40,24 @@ SECTION .text
 	push r15
 %endmacro
 
+%macro popStateNoRax 0
+	pop r15
+	pop r14
+	pop r13
+	pop r12
+	pop r11
+	pop r10
+	pop r9
+	pop r8
+	pop rsi
+	pop rdi
+	pop rbp
+	pop rdx
+	pop rcx
+	pop rbx
+	add rsp, 8
+%endmacro
+
 %macro popState 0
 	pop r15
 	pop r14
@@ -140,8 +158,12 @@ _irq04Handler:
 _irq05Handler:
 	irqHandlerMaster 5
 
+
 _irq80Handler:
+	pushState ;pusheo todos los registros al stack
+	mov r8, rsp ;paso el rsp como parametro nro 5
 	call syscallHandler
+	popStateNoRax ;popeo todos los registros menos rax para no pisar el valor de retorno de syscall handler
 	iretq
 
 

@@ -1,5 +1,5 @@
 GLOBAL _syscall
-
+GLOBAL _opcodeExp
 section .text
 
 
@@ -48,4 +48,8 @@ _syscall:
 	mov rsp, rbp
 	pop rbp
 
+	ret
+
+_opcodeExp:
+	UD2
 	ret
