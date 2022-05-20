@@ -22,20 +22,25 @@ typedef struct {
 
 
 typedef enum {
-  STDIN = 0, STDOUT, STDERR, STDLEFT, STDRIGHT
+  STDIN = 0, STDOUT, STDERR
 } FILE_DESCRIPTOR;
 
 
 void loadWindows();
-void newLine(FILE_DESCRIPTOR fd);
-void printCharColor(FILE_DESCRIPTOR fd, char c, color_t charColor, color_t bgColor, int next);
-void printChar(FILE_DESCRIPTOR fd, char c);
-void clearScreen(FILE_DESCRIPTOR fd);
-void scrollUp(FILE_DESCRIPTOR fd);
-void print(FILE_DESCRIPTOR fd, char* str, size_t count);
+void newLine();
+void printCharColor(char c, color_t charColor, color_t bgColor, int next);
+void printChar(char c);
+void clearScreen();
+void scrollUp();
+void print(char* str, size_t count);
+void printColor(char* str, size_t count, color_t charColor, color_t bgColor);
 void initializeDualScreen();
-void showCursor(FILE_DESCRIPTOR fd);
-void stopCursor(FILE_DESCRIPTOR fd);
+void blinkCursor();
+void stopCursor();
+void setCursor(int active);
+void switchScreens(size_t screen);
+void initializeSingleScreen();
+void initializeDualScreen();
 
 #endif
 

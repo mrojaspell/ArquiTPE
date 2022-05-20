@@ -50,7 +50,7 @@ int sys_write(FILE_DESCRIPTOR fd, const char* buffer, uint64_t size) {
     color_t fontColor = (fd == STDERR) ? (RED) : (WHITE);
     int i;
     for (i = 0; i < size && buffer[i]; i += 1) {
-        printCharColor(fd, buffer[i], fontColor, BLACK, 1);
+        printCharColor(buffer[i], fontColor, BLACK, 1);
     }
     return i;
 }
@@ -66,6 +66,21 @@ int syscallHandler(syscall_id rax, void* arg0, void* arg1, void* arg2) {
             return 0;
         case INFOREG:
             return sys_inforeg((uint64_t *)arg1, (size_t) arg2);
+        case DATENTIME:
+            return 0; // A IMPLEMENTAR
+        case SET_CURSOR:
+            setCursor((int)arg0);
+            return 0;
+        case SET_SCREEN:
+            switchScreens((size_t)arg0);
+            return 0;
+        case TOGGLE_MODE:
+            if (!(size_t)arg0) {
+                initializeSingleScreen();
+            } else {
+                initializeDualScreen();
+            }
+            return 0;
     }
     return -1;
 }

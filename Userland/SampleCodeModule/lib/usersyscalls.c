@@ -19,3 +19,15 @@ int sys_inforeg(uint64_t *buffer, size_t count){
 int sys_dateAndTime(uint64_t id){
   return _syscall(SYS_DNT_ID, (uint64_t)id, 0, 0);
 }
+
+int sys_showCursor(int active) {
+  return _syscall(SYS_CURSOR, active, 0, 0);
+}
+
+int sys_switchScreen(size_t screen) {
+  return _syscall(SYS_SWITCHSCREEN, screen, 0, 0);
+}
+
+int sys_toggleMode(int mode) {
+  return _syscall(SYS_TOGGLEMODE, mode, 0, 0);
+}

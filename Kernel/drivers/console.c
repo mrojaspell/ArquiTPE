@@ -11,44 +11,40 @@ static const uint32_t height = SCREEN_HEIGHT;
 
 // todo: STDIN, STDOUT y STDERR tienen que usar el mismo puntero
 
-static window windows[5] = {
-  { //stdin
-    SCREEN_WIDTH, SCREEN_HEIGHT, {0, 0}, {0, 0}
-  },
+static window windows[3] = {
   { //stdout
     SCREEN_WIDTH, SCREEN_HEIGHT, {0, 0}, {0, 0}
   },
-  { //stderr
-    SCREEN_WIDTH, SCREEN_HEIGHT, {0, 0}, {0, 0}
-  },
   { //stleft
-    SCREEN_WIDTH / 2 - 1, SCREEN_HEIGHT, {0, 0}, {0, 0}
+    SCREEN_WIDTH / 2 - 2, SCREEN_HEIGHT, {0, 0}, {0, 0}
   },
   { //stdright
-    SCREEN_WIDTH / 2, SCREEN_HEIGHT, {SCREEN_WIDTH / 2, 0}, {SCREEN_WIDTH / 2, 0}
+    SCREEN_WIDTH / 2, SCREEN_HEIGHT, {SCREEN_WIDTH / 2 - 1, 0}, {SCREEN_WIDTH / 2 - 1, 0}
   }
 };
 
-void goNextPosition(window* win);
+static int currentWindow = 0;
+
+void goNextPosition();
 uint8_t* getPosition(int y, int x);
 
-void restartCurrentPos(FILE_DESCRIPTOR fd) {
-  windows[fd].currPos.x = windows[fd].start.x;
-  windows[fd].currPos.y = windows[fd].start.y;
+void restartCurrentPos() {
+  windows[currentWindow].currPos.x = windows[currentWindow].start.x;
+  windows[currentWindow].currPos.y = windows[currentWindow].start.y;
 }
 
-void clearScreen(FILE_DESCRIPTOR fd) {
-  restartCurrentPos(fd);
+void clearScreen() {
+  restartCurrentPos(currentWindow);
     
-  for (int h = 0; h <= windows[fd].height; h += 1) {
-    newLine(fd);
+  for (int h = 0; h <= windows[currentWindow].height; h += 1) {
+    newLine(currentWindow);
   }
 
-  restartCurrentPos(fd);
+  restartCurrentPos(currentWindow);
 }
 
-void scrollUp(FILE_DESCRIPTOR fd) {
-  window win = windows[fd];
+void scrollUp() {
+  window win = windows[currentWindow];
   for (int i = 1; i < win.height; i += 1) {
     for (int j = 0; j < win.width; j += 1) {
       *(getPosition(win.start.y + i - 1, win.start.x + j)) = *(getPosition(win.start.y + i, win.start.x + j));
@@ -59,72 +55,87 @@ void scrollUp(FILE_DESCRIPTOR fd) {
   for (int j = 0; j < win.width; j += 1) {
     *(getPosition(win.start.y + win.height - 1, j)) = ' ';
   }
-  windows[fd].currPos.y -= 1;
+  windows[currentWindow].currPos.y -= 1;
 }
 
-void print(FILE_DESCRIPTOR fd, char* str, size_t count) {
+void print(char* str, size_t count) {
   for (int i = 0; i < count; i += 1) {
-    printChar(fd, str[i]);
+    printChar(str[i]);
+  }
+}
+
+void printColor(char* str, size_t count, color_t charColor, color_t bgColor) {
+  for (int i = 0; i < count; i += 1) {
+    printCharColor(str[i], charColor, bgColor, 1);
   }
 }
 
 
-void newLine(FILE_DESCRIPTOR fd) {
+void newLine() {
   do {
-    printChar(fd, ' ');
-  } while (windows[fd].currPos.x != windows[fd].start.x);
+    printChar(' ');
+  } while (windows[currentWindow].currPos.x != windows[currentWindow].start.x);
 }
 
-void printChar(FILE_DESCRIPTOR fd, char c) {
-  printCharColor(fd, c, LGREY, BLACK, 1);
+void printChar(char c) {
+  printCharColor(c, LGREY, BLACK, 1);
 }
 
 void initializeDualScreen() {
   for (int i = 0; i < height; i += 1) {
-    *(getPosition(i, width / 2 - 1)) = 219;
+    *(getPosition(i, width / 2 - 2)) = 219;
   }
+  currentWindow = 2;
+  restartCurrentPos();
+  currentWindow = 1;
+  restartCurrentPos();
 }
 
-void deleteChar(FILE_DESCRIPTOR fd) {
-  if(windows[fd].currPos.x == windows[fd].start.x){        
-        if (windows[fd].currPos.y > windows[fd].start.y) {
-          windows[fd].currPos.y -= 1;                               
-          windows[fd].currPos.x = windows[fd].width-1;
-          printCharColor(fd, ' ', WHITE, BLACK, 0);
+void initializeSingleScreen() {
+  currentWindow = 0;
+  restartCurrentPos();
+}
+
+void deleteChar() {
+  if(windows[currentWindow].currPos.x == windows[currentWindow].start.x){        
+        if (windows[currentWindow].currPos.y > windows[currentWindow].start.y) {
+          windows[currentWindow].currPos.y -= 1;                               
+          windows[currentWindow].currPos.x = windows[currentWindow].width-1;
+          printCharColor(' ', WHITE, BLACK, 0);
         }
   } else {
-    windows[fd].currPos.x = (windows[fd].currPos.x-1) % windows[fd].width;
-    printCharColor(fd, ' ', WHITE, BLACK, 0);
+    windows[currentWindow].currPos.x = (windows[currentWindow].currPos.x-1) % windows[currentWindow].width;
+    printCharColor(' ', WHITE, BLACK, 0);
   }
 }
 
-void printCharColor(FILE_DESCRIPTOR fd, char c, color_t charColor, color_t bgColor, int next){
+void printCharColor(char c, color_t charColor, color_t bgColor, int next){
   if(c == '\b') {
-    deleteChar(fd);
+    deleteChar();
     return;
   }
 
-  if (windows[fd].currPos.y == windows[fd].height + windows[fd].start.y) {
-    scrollUp(fd);
+  if (windows[currentWindow].currPos.y == windows[currentWindow].height + windows[currentWindow].start.y) {
+    scrollUp();
   }
 
   // Newline
   if(c == '\n'){
-    newLine(fd);
+    newLine();
     return;
   }
 
   if (c == '\t') {
-    for (int i = 0; i < 2; i += 1) printCharColor(fd, ' ', charColor, bgColor, 1);
+    for (int i = 0; i < 2; i += 1) printCharColor(' ', charColor, bgColor, 1);
     return;
   }
   
-  uint8_t* current = getPosition(windows[fd].currPos.y, windows[fd].currPos.x);
+  uint8_t* current = getPosition(windows[currentWindow].currPos.y, windows[currentWindow].currPos.x);
   *(current) = c;
   *(current + 1) = ((bgColor << 4) | charColor);
   
   if (next) {
-    goNextPosition(&(windows[fd]));
+    goNextPosition();
   }
 }
 
@@ -133,26 +144,44 @@ uint8_t* getPosition(int y, int x) {
   return (video + x * 2 + y * width * 2);
 }
 
-void goNextPosition(window* win) {
-  int goNextLine = win->currPos.x == (win->start.x + win->width - 1);
-  win->currPos.x = (!goNextLine) ? win->currPos.x + 1 : 0;
-  win->currPos.y += goNextLine;
+void goNextPosition() {
+  int goNextLine = windows[currentWindow].currPos.x == (windows[currentWindow].start.x + windows[currentWindow].width - 1);
+  windows[currentWindow].currPos.x = (!goNextLine) ? windows[currentWindow].currPos.x + 1 : windows[currentWindow].start.x;
+  windows[currentWindow].currPos.y += goNextLine;
 }
 
-void showCursor(FILE_DESCRIPTOR fd) {
-  int change = 0;
-  if (!change && (ticks_elapsed() % 9 == 0)) {
-    change = 1;
-    printCharColor(fd, '_', WHITE, BLACK, 0);
-    if (ticks_elapsed() % 18 == 0) {
-      printCharColor(fd, ' ', WHITE, BLACK, 0);
-    }
-    if (change && ticks_elapsed() % 6 != 0) {
-      change = 0;
+static int cursorActive = 0;
+
+// si vale 1, esta activo
+void setCursor(int active) {
+  cursorActive = active;
+  if (!active) {
+    stopCursor();
+  }
+}
+
+void blinkCursor() {
+  if (cursorActive) {
+    int change = 0;
+    if (!change && (ticks_elapsed() % 9 == 0)) {
+      change = 1;
+      printCharColor('_', WHITE, BLACK, 0);
+      if (ticks_elapsed() % 18 == 0) {
+        printCharColor(' ', WHITE, BLACK, 0);
+      }
+      if (change && ticks_elapsed() % 6 != 0) {
+        change = 0;
+      }
     }
   }
 }
 
-void stopCursor(FILE_DESCRIPTOR fd) {
-  printCharColor(fd, ' ', WHITE, BLACK, 0);
+void stopCursor() {
+  printCharColor(' ', WHITE, BLACK, 0);
 }
+
+void switchScreens(size_t screen) {
+  if (screen < 3) {
+    currentWindow = screen;
+  }
+} 

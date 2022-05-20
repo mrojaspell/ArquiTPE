@@ -102,7 +102,7 @@ int main()
 	ncPrint("Press enter to log in\n");
 	int c;
 	while((c = getChar()) != '\n');
-	
+
   ((EntryPoint)sampleCodeModuleAddress)();
 	return 0;
 }

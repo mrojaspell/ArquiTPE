@@ -118,7 +118,6 @@ void keyboardHandler(uint64_t rsp){
         return;
     
     teclahex = _getKey();
-    debugBase(teclahex, 10);
     if (teclahex == RSHIFT || teclahex == LSHIFT) //si toco shift
         shiftFlag = 1;
     else if (teclahex == RSHIFT+RELEASE || teclahex == LSHIFT+RELEASE) //si antes habia tocado shift y ahora toque una letra
@@ -151,18 +150,11 @@ char getChar(){
 
     do{
         c = removeFromBuffer();
+        blinkCursor();
         _hlt();
     } while (c == -1);
     
-    /*
-    c = removeFromBuffer();
-    while(c==-1){
-        showCursor(STDOUT);
-        _hlt();
-         c=removeFromBuffer();
-    }
-    stopCursor(STDOUT);*/
-
+    stopCursor();
     return c;
 }
 

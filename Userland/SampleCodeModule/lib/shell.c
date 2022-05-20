@@ -57,7 +57,10 @@ void runCommand(const char *str) {
 
 void initShell() {
   clear_screen(1);
+  sys_toggleMode(1);
+  sys_switchScreen(2);
   while (1) {
+    sys_showCursor(1);
     _putc(STDOUT, '>');
     char *commandLine = getCommandLine();
     _putc(STDOUT, '\n');

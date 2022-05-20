@@ -3,11 +3,16 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#define SYS_READ_ID 0
-#define SYS_WRITE_ID 1
-#define SYS_CLEAR_ID 2
-#define SYS_INFOREG_ID 3
-#define SYS_DNT_ID 4
+enum {
+  SYS_READ_ID, 
+  SYS_WRITE_ID, 
+  SYS_CLEAR_ID, 
+  SYS_INFOREG_ID, 
+  SYS_DNT_ID, 
+  SYS_CURSOR, 
+  SYS_SWITCHSCREEN, 
+  SYS_TOGGLEMODE
+};
 
 
 
@@ -18,4 +23,9 @@ int sys_write(uint8_t fd, const char *buffer, size_t count);
 int sys_clear(uint8_t fd);
 int sys_inforeg(uint64_t *buffer, size_t count);
 int sys_dateAndTime(uint64_t id);
+int sys_showCursor(int active);
+int sys_switchScreen(size_t screen);
+int sys_toggleMode(int mode);
+
+
 #endif
