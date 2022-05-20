@@ -129,3 +129,6 @@ pom.xml.tag
 run.sh
 
 .vscode/
+.vscode/settings.json
+.vscode/c_cpp_properties.json
+Image/x64BareBonesImage.img

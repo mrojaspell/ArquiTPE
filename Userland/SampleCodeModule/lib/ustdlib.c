@@ -15,7 +15,7 @@ void _fprint(uint8_t fd, const char* str) {
   }
 }
 
-// tomado de https://stackoverflow.com/questions/1735236/how-to-write-my-own-printf-in-c
+// Inspirado de https://stackoverflow.com/questions/1735236/how-to-write-my-own-printf-in-c
 void _fprintf(uint8_t fd, char* format, ...) 
 { 
     //Module 1: Initializing Myprintf's arguments 
@@ -25,45 +25,52 @@ void _fprintf(uint8_t fd, char* format, ...)
     char *traverse; 
     unsigned int i; 
     char *s;
+
+    int hasFormat = 0;
      
     for(traverse = format; *traverse != '\0'; traverse++) 
     { 
-        while( *traverse != '%' ) 
-        { 
-            _putc(fd, *traverse);
-            traverse++; 
-        } 
+        if (*traverse == '%') {
+          if (hasFormat == 1) {
+            _putc(STDOUT, '%');
+          }
+          hasFormat = 1;
+        } else if (hasFormat) {
+          //Module 2: Fetching and executing arguments
+          switch(*traverse) 
+          { 
+              case 'c' : i = va_arg(arg,int);     //Fetch char argument
+                          _putc(fd, i);
+                          break; 
 
-        traverse++; 
+              case 'd' : i = va_arg(arg,int);         //Fetch Decimal/Integer argument
+                          if(i<0) 
+                          { 
+                              i = -i;
+                              _putc(fd, '-'); 
+                          } 
+                          _fprint(fd, convert(i,10));
+                          break; 
 
-        //Module 2: Fetching and executing arguments
-        switch(*traverse) 
-        { 
-            case 'c' : i = va_arg(arg,int);     //Fetch char argument
-                        _putc(fd, i);
-                        break; 
+              case 'o': i = va_arg(arg,unsigned int); //Fetch Octal representation
+                          _fprint(fd, convert(i,8));
+                          break; 
 
-            case 'd' : i = va_arg(arg,int);         //Fetch Decimal/Integer argument
-                        if(i<0) 
-                        { 
-                            i = -i;
-                            _putc(fd, '-'); 
-                        } 
-                        _fprint(fd, convert(i,10));
-                        break; 
+              case 's': s = va_arg(arg,char *);       //Fetch string
+                          _fprint(fd, s); 
+                          break; 
 
-            case 'o': i = va_arg(arg,unsigned int); //Fetch Octal representation
-                        _fprint(fd, convert(i,8));
-                        break; 
+              case 'x': i = va_arg(arg,unsigned int); //Fetch Hexadecimal representation
+                          _fprint(fd, convert(i,16));
+                          break;
+              default:
+                          _putc(STDOUT, '%');
+          }
+          hasFormat = 0;
+        } else {
+          _putc(STDOUT, *traverse);
+        }
 
-            case 's': s = va_arg(arg,char *);       //Fetch string
-                        _fprint(fd, s); 
-                        break; 
-
-            case 'x': i = va_arg(arg,unsigned int); //Fetch Hexadecimal representation
-                        _fprint(fd, convert(i,16));
-                        break; 
-        }   
     } 
 
     //Module 3: Closing argument list to necessary clean-up
