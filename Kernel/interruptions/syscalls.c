@@ -24,7 +24,7 @@ int sys_inforeg(uint64_t *buffer, size_t count){
     return 0;
 }
 
-void printMem(uint64_t direc, uint8_t * buffer, uint64_t bytes){
+void sys_getMem(uint64_t direc, uint8_t * buffer, uint64_t bytes){
     for (uint8_t i = 0; i < bytes; i++) {
         buffer[i] = (uint8_t) _getMem(direc+i);     // llamo 'bytes'(32) veces a _getMem con 32 posiciones de memoria distintos
     }
@@ -57,30 +57,42 @@ int sys_write(FILE_DESCRIPTOR fd, const char* buffer, uint64_t size) {
 
 int syscallHandler(syscall_id rax, void* arg0, void* arg1, void* arg2) {
     switch (rax) {
-        case READ:
+        case SYS_READ:
             return sys_read((FILE_DESCRIPTOR)arg0, (char *)arg1, (size_t)arg2);
-        case WRITE:
+            break;
+        case SYS_WRITE:
             return sys_write((FILE_DESCRIPTOR)arg0, (char *)arg1, (size_t)arg2);
-        case CLEAN_SCREEN:
+            break;
+        case SYS_CLEAN_SCREEN:
             clearScreen((FILE_DESCRIPTOR)arg0);
             return 0;
-        case INFOREG:
+            break;
+        case SYS_INFOREG:
             return sys_inforeg((uint64_t *)arg1, (size_t) arg2);
-        case DATENTIME:
-            return sys_dateAndTime((uint64_t*) arg0); // A IMPLEMENTAR
-        case SET_CURSOR:
+            break;
+        case SYS_DATENTIME:
+            return sys_dateAndTime((uint64_t) arg0);
+            break;
+        case SYS_PRINTMEM:
+            sys_getMem((uint64_t)arg0, (uint8_t *)arg1, (uint64_t) arg2);
+            return 0;
+            break;
+        case SYS_SET_CURSOR:
             setCursor((int)arg0);
             return 0;
-        case SET_SCREEN:
+            break;
+        case SYS_SET_SCREEN:
             switchScreens((size_t)arg0);
             return 0;
-        case TOGGLE_MODE:
+            break;
+        case SYS_TOGGLE_MODE:
             if (!(size_t)arg0) {
                 initializeSingleScreen();
             } else {
                 initializeDualScreen();
             }
             return 0;
+            break;
     }
     return -1;
 }

@@ -113,7 +113,32 @@ char *convert(unsigned int num, int base)
     return(ptr); 
 }
 
-int toLower(int chr)
-{
+static int isdigit(char ch) {
+    return ch >= '0' && ch <= '9';
+}
+
+static int ishexdigit(char ch){
+        return isdigit(ch) || (ch >= 'A' && ch <= 'F') || (ch >= 'a' && ch <= 'f');
+}
+
+int strToHex(const char *str){
+    int val = 0;      
+    while( *str != 0 ) {  
+        if( !ishexdigit(*str) ) { 
+            return -1;
+        }
+        if( isdigit(*str) ) {    
+            val = val * 16 + *str++ - '0';      
+        } else if( *str >= 'A' && *str <= 'F' ) {    
+            val = val * 16 + *str++ - 'A' + 10;      
+        } else {   
+            val = val * 16 + *str++ - 'a' + 10;      
+        }
+    }
+    return val;   
+}
+
+
+int toLower(int chr){
     return (chr >='A' && chr<='Z') ? (chr + 32) : (chr);    
 }

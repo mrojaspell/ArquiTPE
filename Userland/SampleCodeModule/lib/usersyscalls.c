@@ -20,14 +20,18 @@ int sys_dateAndTime(uint64_t id){
   return _syscall(SYS_DNT_ID, (uint64_t)id, 0, 0);
 }
 
+int sys_printMem(uint64_t direc, uint8_t * buffer, uint64_t bytes){
+  return _syscall(SYS_PRINTMEM_ID,(uint64_t)direc, (uint8_t*) buffer, (uint64_t)bytes);
+}
+
 int sys_showCursor(int active) {
-  return _syscall(SYS_CURSOR, active, 0, 0);
+  return _syscall(SYS_CURSOR_ID, active, 0, 0);
 }
 
 int sys_switchScreen(size_t screen) {
-  return _syscall(SYS_SWITCHSCREEN, screen, 0, 0);
+  return _syscall(SYS_SWITCHSCREEN_ID, screen, 0, 0);
 }
 
 int sys_toggleMode(int mode) {
-  return _syscall(SYS_TOGGLEMODE, mode, 0, 0);
+  return _syscall(SYS_TOGGLEMODE_ID, mode, 0, 0);
 }

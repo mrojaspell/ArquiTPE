@@ -2,18 +2,22 @@
 #define SYSCALLS_H
 #include <stdint.h>
 #include <stdlib.h>
+#include <console.h>
 
 typedef enum {
-  READ=0, WRITE, CLEAN_SCREEN, INFOREG, DATENTIME, SET_CURSOR, SET_SCREEN, TOGGLE_MODE,
+  SYS_READ=0, SYS_WRITE, SYS_CLEAN_SCREEN, SYS_INFOREG, SYS_DATENTIME, SYS_PRINTMEM, SYS_SET_CURSOR, SYS_SET_SCREEN, SYS_TOGGLE_MODE,
 } syscall_id;
 
 #define REGISTERS 16
 
 extern uint8_t _getRTCInfo(uint64_t);
-uint8_t getCurrentTime(uint64_t rtcID);
-int sys_inforeg(uint64_t *buffer, size_t count);
-void printMem(uint64_t direc, uint8_t * buffer, uint64_t bytes);
 extern uint8_t _getMem(uint64_t direc);
 
+uint8_t sys_dateAndTime(uint64_t rtcID);
+int sys_inforeg(uint64_t *buffer, size_t count);
+void sys_getMem(uint64_t direc, uint8_t * buffer, uint64_t bytes);
+int sys_read(FILE_DESCRIPTOR fd, char* buffer, size_t count);
+int sys_write(FILE_DESCRIPTOR fd, const char* buffer, uint64_t size);
+int syscallHandler(syscall_id rax, void* arg0, void* arg1, void* arg2);
 
 #endif

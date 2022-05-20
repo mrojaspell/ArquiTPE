@@ -1,7 +1,7 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
-#define COMMANDS_LENGTH 4
-
+#define COMMANDS_LENGTH 5
+#define DUMP_SIZE 32
 
 typedef struct {
   char *name;
@@ -22,5 +22,6 @@ void dateAndTime();
 void help();
 void infoReg();
 void holaMundo();
+void printmem(char address);
 
 #endif
