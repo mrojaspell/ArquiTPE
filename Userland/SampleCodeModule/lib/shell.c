@@ -6,65 +6,179 @@
 #include <commands.h>
 
 #define BUFFER_LENGTH 256
+#define MAX_ARGS 20
 
+/* TEMP
+  'c' para volver a modo una pantalla
+  '1' para suspender o activar primer programa
+  '2' para suspender o activar segundo programa
+*/
 
-// recibe una linea de commando y te devuelve si es ese commando o no
-int isCommand(const char* commandLine, const char* command) {
-  int cl_i = 0;
-  int c_i = 0;
-  while (commandLine[cl_i] == ' ') {
-    cl_i += 1;
+int eventLoop(caller* programs, int programCount) {
+  int endedFirstProgram = 0;
+  int endedSecondProgram = !(programCount == 2);
+  int runFirstProgram = 1;
+  int runSecondProgram = programCount == 2;
+  if (programCount == 2) {
+    sys_toggleMode(1);
+    sys_clear(STDOUT);
   }
-  while (command[c_i] != '\0' && commandLine[cl_i] != '\0') {
-    if (toLower(commandLine[cl_i]) != toLower(command[c_i])) return 0;
-    cl_i += 1;
-    c_i += 1;
-  }
 
-  return command[c_i] == '\0' && (commandLine[cl_i] == ' ' || commandLine[cl_i] == '\n' || commandLine[cl_i] == '\0');
+  while (!(endedFirstProgram && endedSecondProgram)) {
+    // FALTA HACER METODO DE CANCELAR EJECUCION
+    // int c = 0;
+    // if (c == 'c') {
+    //   break;
+    // } else if (c == '1') {
+    //   runFirstProgram = !runFirstProgram;
+    // } else if (c == '2') {
+    //   runSecondProgram = !runSecondProgram;
+    // }
+
+    if (runFirstProgram && !endedFirstProgram) {
+      if (programCount == 2) {
+        sys_switchScreen(1);
+      }
+      endedFirstProgram = programs[0].module.runner(programs[0].argCount, programs[0].args);
+    }
+    if (runSecondProgram && !endedSecondProgram) {
+      if (programCount == 2) {
+        sys_switchScreen(2);
+      }
+      endedSecondProgram = programs[1].module.runner(programs[0].argCount, programs[0].args);
+    }
+  }
+  if (programCount == 2) {
+    sys_switchScreen(0);
+    sys_toggleMode(0);
+  }
+  return 0;
 }
 
+// Devuelve strings con delimitador de ' '.
+// strings es el array de char*
 
-char* getCommandLine() {
+int getCommandLine(char** strings) {
   static char buffer[BUFFER_LENGTH];
+  buffer[BUFFER_LENGTH - 1] = '\0'; // Por las dudas
 
+  char* startString = buffer; // Guarda el puntero al string que esta obteniendo
   int c;
   int i = 0;
-  while ((c = getChar()) != '\n') {
-    if (c != '\b' && i < BUFFER_LENGTH - 1) {
-      buffer[i++] = c;
-      _putc(STDOUT, c);
-    } else if (i > 0) {
-        i--;
-        _putc(STDOUT, '\b');
+  int res_index = 0;
+  while ((c = getChar()) != '\n' && i < BUFFER_LENGTH - 1 && res_index < MAX_ARGS) {
+    switch(c) {
+      case '\b':
+        if (i != 0) {
+          i--;
+          _putc(STDOUT, c);
+        }
+        break;
+      case ' ':
+        buffer[i++] = '\0';
+        strings[res_index++] = startString;
+        startString = buffer + i;
+        _putc(STDOUT, c);
+        break;
+      default:
+        buffer[i++] = c;
+        _putc(STDOUT, c);
     }
   }
-  buffer[i] = '\0';
-  return buffer;
+  if (i == 0) return 0;
+  buffer[i] = '\0'; //Resuelve el ultimo string presente
+  strings[res_index++] = startString;
+  return res_index;
 }
 
-void runCommand(const char *str) {
-  int length;
-  command* commands = getCommands(&length);
-  for (int i = 0; i < length; i += 1) {
-    if (isCommand(str, commands[i].name)) {
-      return commands[i].runner();
+int runCommandLine(int argCount, char** args) {
+  if (argCount == 0) return 0;
+  int pipeIndex = 0;
+  int stop = 0;
+  for (int i = 0; i < argCount && !stop; i += 1) {
+    if (_strcasecmp(args[i], "|")) {
+      pipeIndex = i;
+      stop = 1;
     }
   }
-  _fprint(STDOUT, "Este comando no es valido");
-  return;
+
+  int commandsCount = 0;
+  command* commandList = getCommands(&commandsCount);
+
+  // Encontre el pipe
+  if (stop == 1) {
+    if (pipeIndex == 0) {
+      _print("El operador pipe no tiene primer operando\n");
+      return 0;
+    }
+    if (pipeIndex == (argCount - 1)) {
+      _print("El operador pipe no tiene segundo operando\n");
+      return 0;
+    }
+    int firstCommandIndex = -1;
+    int secondCommandIndex = -1;
+    char* firstCommand = args[0];
+    char* secondCommand = args[pipeIndex + 1];
+
+    for (int i = 0; i < commandsCount && (firstCommandIndex == -1 || secondCommandIndex == -1); i += 1) {
+      if (_strcasecmp(firstCommand, commandList[i].name)) {
+        firstCommandIndex = i;
+      }
+      if (_strcasecmp(secondCommand, commandList[i].name)) {
+        secondCommandIndex = i;
+      }
+    }
+
+    if (firstCommandIndex == -1) {
+      _fprintf(STDOUT, "%s no es un comando valido", firstCommand);
+      return 0;
+    }
+    if (secondCommandIndex == -1) {
+      _fprintf(STDOUT, "%s no es un comando valido", secondCommand);
+      return 0;
+    }
+
+    caller callers[2];
+    callers[0].argCount = pipeIndex - 1;
+    callers[0].args = &(args[1]);
+    callers[0].module = commandList[firstCommandIndex];
+    callers[1].argCount = argCount - pipeIndex - 2;
+    callers[1].args = &(args[pipeIndex + 1]);
+    callers[1].module = commandList[secondCommandIndex];
+
+    eventLoop(callers, 2);
+    return 1;
+  } else {
+    int commandIndex = -1;
+    for (int i = 0; i < commandsCount && commandIndex == -1; i += 1) {
+      if (_strcasecmp(args[0], commandList[i].name)) {
+        commandIndex = i;
+      }
+    }
+    
+    if (commandIndex == -1) {
+      _fprintf(STDOUT, "%s no es un comando valido", args[0]);
+      return 0;
+    }
+  
+    caller c;
+    c.argCount = argCount - 1;
+    c.args = &(args[1]);
+    c.module = commandList[commandIndex];
+    eventLoop(&c, 1);
+    return 1;
+  }
 }
 
 void initShell() {
   clear_screen(1);
-  sys_toggleMode(1);
-  sys_switchScreen(2);
   while (1) {
     sys_showCursor(1);
     _putc(STDOUT, '>');
-    char *commandLine = getCommandLine();
+    char* args[MAX_ARGS];
+    int count = getCommandLine(args);
     _putc(STDOUT, '\n');
-    runCommand(commandLine);
-    _putc(STDOUT, '\n');
+    sys_showCursor(0);
+    runCommandLine(count, args);
   }
 }

@@ -100,11 +100,11 @@ void deleteChar() {
   if(windows[currentWindow].currPos.x == windows[currentWindow].start.x){        
         if (windows[currentWindow].currPos.y > windows[currentWindow].start.y) {
           windows[currentWindow].currPos.y -= 1;                               
-          windows[currentWindow].currPos.x = windows[currentWindow].width-1;
+          windows[currentWindow].currPos.x = windows[currentWindow].width + windows[currentWindow].start.x -1;
           printCharColor(' ', WHITE, BLACK, 0);
         }
   } else {
-    windows[currentWindow].currPos.x = (windows[currentWindow].currPos.x-1) % windows[currentWindow].width;
+    windows[currentWindow].currPos.x = (windows[currentWindow].currPos.x-1);
     printCharColor(' ', WHITE, BLACK, 0);
   }
 }

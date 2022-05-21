@@ -1,12 +1,15 @@
 #include <ustdlib.h>
 #include <usersyscalls.h>
 
-char* convert(unsigned int, int);       //Convert integer number into octal, hex, etc.
 
 int _strlen(const char* str) {
   int i;
   for (i = 0; str[i] != '\0'; i += 1);
   return i;
+}
+
+void _print(const char *str) {
+  _fprint(STDOUT, str);
 }
 
 void _fprint(uint8_t fd, const char* str) {
@@ -49,11 +52,11 @@ void _fprintf(uint8_t fd, char* format, ...)
                               i = -i;
                               _putc(fd, '-'); 
                           } 
-                          _fprint(fd, convert(i,10));
+                          _fprint(fd, _itoa(i,10));
                           break; 
 
               case 'o': i = va_arg(arg,unsigned int); //Fetch Octal representation
-                          _fprint(fd, convert(i,8));
+                          _fprint(fd, _itoa(i,8));
                           break; 
 
               case 's': s = va_arg(arg,char *);       //Fetch string
@@ -61,7 +64,7 @@ void _fprintf(uint8_t fd, char* format, ...)
                           break; 
 
               case 'x': i = va_arg(arg,unsigned int); //Fetch Hexadecimal representation
-                          _fprint(fd, convert(i,16));
+                          _fprint(fd, _itoa(i,16));
                           break;
               default:
                           _putc(STDOUT, '%');
@@ -95,7 +98,7 @@ int getChar() {
   return c;
 }
 
-char *convert(unsigned int num, int base) 
+char *_itoa(unsigned int num, int base) 
 { 
     static char Representation[]= "0123456789ABCDEF";
     static char buffer[50]; 
@@ -113,21 +116,33 @@ char *convert(unsigned int num, int base)
     return(ptr); 
 }
 
-static int isdigit(char ch) {
-    return ch >= '0' && ch <= '9';
+long _atoi(const char *str) {
+  long res = 0;
+  int i = 0;
+
+  for (; str[i] == ' ' && str[i] != '\0'; i += 1); // elimino espacios en blanco
+  while (str[i] && IS_DIGIT(str[i])) {
+    res = res * 10 + (str[i] - '0');
+    i += 1;
+  } 
+  return res;
 }
 
-static int ishexdigit(char ch){
-        return isdigit(ch) || (ch >= 'A' && ch <= 'F') || (ch >= 'a' && ch <= 'f');
+int _strcasecmp(const char *str1, const char* str2) {
+  while (*str1 != '\0' && *str2 != '\0' && toLower(*str1) == toLower(*str2)) {
+    str1 += 1;
+    str2 += 1;
+  }
+  return *str1 == '\0' && *str2 == '\0';
 }
 
 int strToHex(const char *str){
     int val = 0;      
     while( *str != 0 ) {  
-        if( !ishexdigit(*str) ) { 
+        if( !IS_HEXDIGIT(*str) ) { 
             return -1;
         }
-        if( isdigit(*str) ) {    
+        if( IS_DIGIT(*str) ) {    
             val = val * 16 + *str++ - '0';      
         } else if( *str >= 'A' && *str <= 'F' ) {    
             val = val * 16 + *str++ - 'A' + 10;      

@@ -4,7 +4,19 @@
 #include <RTCID.h>
 #include <usersyscalls.h>
 
+int runOnceProgram() {
+  _print("corri una vez");
+  return 1;
+}
+
+int runInfiniteProgram() {
+  _print("corro y corro");
+  return 0;
+}
+
 static command commands[COMMANDS_LENGTH] = {
+  {"test1", &runOnceProgram, "test1"},
+  {"test2", &runInfiniteProgram, "test2"},
   { "date&time", &dateAndTime, "Imprime la fecha y el horario."}, 
   { "divZero", &divZero, "Genera una excepción de dividir por 0"},
   { "hello", &holaMundo, "Saluda al mundo." }, 

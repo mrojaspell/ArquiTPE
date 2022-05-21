@@ -3,9 +3,16 @@
 #define COMMANDS_LENGTH 7
 #define DUMP_SIZE 32
 
+
+/* 
+  Los programas validos son estos:
+  Que reciban la cantidad de variables, los argumentos en un array de strings
+  Tienen que devolver si termino su ejecucion o no. 1 si termino, 0 sino.
+*/ 
+
 typedef struct {
   char *name;
-  void (*runner)();
+  int (*runner)(int count, char** args);
   char *description;
 } command;
 
