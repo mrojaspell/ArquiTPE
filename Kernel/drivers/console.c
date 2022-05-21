@@ -8,8 +8,7 @@ static uint8_t * const video = (uint8_t*)0xB8000;
 static const uint32_t width = SCREEN_WIDTH;
 static const uint32_t height = SCREEN_HEIGHT;
 
-
-// todo: STDIN, STDOUT y STDERR tienen que usar el mismo puntero
+static char buffer[64] = { '0' };
 
 static window windows[3] = {
   { //stdout
@@ -23,7 +22,18 @@ static window windows[3] = {
   }
 };
 
+static int strlen(char * string){
+	if(string == NULL)
+		return -1;
+	int i = 0;
+	while(string[i] != '\0')
+		i++;
+	return i;
+}
+
+
 static int currentWindow = 0;
+static uint32_t uintToBase(uint64_t value, char * buffer, uint32_t base);
 
 void goNextPosition();
 uint8_t* getPosition(int y, int x);
@@ -58,6 +68,11 @@ void scrollUp() {
   windows[currentWindow].currPos.y -= 1;
 }
 
+void printBase(uint64_t value, uint32_t base) {
+  uintToBase(value, buffer, base);
+  print(buffer, strlen(buffer));
+}
+
 void print(char* str, size_t count) {
   for (int i = 0; i < count; i += 1) {
     printChar(str[i]);
@@ -69,7 +84,6 @@ void printColor(char* str, size_t count, color_t charColor, color_t bgColor) {
     printCharColor(str[i], charColor, bgColor, 1);
   }
 }
-
 
 void newLine() {
   do {
@@ -185,3 +199,36 @@ void switchScreens(size_t screen) {
     currentWindow = screen;
   }
 } 
+
+static uint32_t uintToBase(uint64_t value, char * buffer, uint32_t base)
+{
+	char *p = buffer;
+	char *p1, *p2;
+	uint32_t digits = 0;
+
+	//Calculate characters for each digit
+	do
+	{
+		uint32_t remainder = value % base;
+		*p++ = (remainder < 10) ? remainder + '0' : remainder + 'A' - 10;
+		digits++;
+	}
+	while (value /= base);
+
+	// Terminate string in buffer.
+	*p = 0;
+
+	//Reverse string in buffer.
+	p1 = buffer;
+	p2 = p - 1;
+	while (p1 < p2)
+	{
+		char tmp = *p1;
+		*p1 = *p2;
+		*p2 = tmp;
+		p1++;
+		p2--;
+	}
+
+	return digits;
+}

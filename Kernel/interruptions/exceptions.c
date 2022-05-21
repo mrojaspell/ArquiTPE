@@ -25,16 +25,14 @@ static int strlen(char * string){
 	if(string == NULL)
 		return -1;
 	int i = 0;
-	while(string[i] != NULL)
+	while(string[i] != '\0')
 		i++;
 	return i;
 }
 
 static void printRegisters(uint64_t *rsp){
-	
 	for(int i = 0; i < 16; i++){
-		//char buffer[8] = {0};
-		ncPrintHex(rsp[i]);
+		printBase(rsp[i], 16);
 	}
 }
 

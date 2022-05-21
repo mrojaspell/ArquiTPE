@@ -28,6 +28,7 @@ typedef enum {
 
 void loadWindows();
 void newLine();
+void printBase(uint64_t value, uint32_t base);
 void printCharColor(char c, color_t charColor, color_t bgColor, int next);
 void printChar(char c);
 void clearScreen();

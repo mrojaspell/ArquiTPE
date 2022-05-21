@@ -1,6 +1,6 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
-#define COMMANDS_LENGTH 7
+#define COMMANDS_LENGTH 9
 #define DUMP_SIZE 32
 
 
@@ -28,13 +28,13 @@ command* getCommands(int* size);
 
 extern int _opcodeExp();
 
-void dateAndTime();
-void help();
-void infoReg();
-void holaMundo();
-void printmem(char* address);
-void divZero();
-void invalidOpcode();
+int dateAndTime();
+int help();
+int infoReg();
+int holaMundo();
+int printmem(int argc, char* argv[]);
+int divZero();
+int invalidOpcode();
 
 
 #endif

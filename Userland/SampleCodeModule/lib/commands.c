@@ -26,38 +26,46 @@ static command commands[COMMANDS_LENGTH] = {
   { "printmem", &printmem, "Volcado de memoria de 32 bytes a partir de la dirección recibida como  argumento."},
 };
 
-void divZero(){
+int divZero(){
   int aux1 = 1;
   int aux2 = 0;
   int div0 = aux1/aux2;
-  return;
+  return 1;
 }
 
-void invalidOpcode(){
+int invalidOpcode(){
   _opcodeExp();
+  return 1;
 }
 
-void printmem(char* address){
+int printmem(int argc, char* argv[]){
+  if (argc < 1) {
+    _print("No se dio una direccion de memoria\n");
+    return 1;
+  } 
+  char* address = argv[0];
+
+  // Chequear que strToHex devuelva -1 si no es hex
   uint64_t memDir = strToHex(address);
 	if(memDir == -1){
     _fprintf(STDOUT,"\nLa direccion ingresada no es alcanzable (%s)",address);
     return;
   }
   _fprintf("\nDump de 32 bytes a partir de la direccion: %s\n\n", address);
+
   uint8_t buffer[DUMP_SIZE];
   sys_printMem(memDir, buffer, DUMP_SIZE);
   for(int i = 0; i < DUMP_SIZE; i++){
-      if(i == 16){
+      if(i == 15){
         _fprintf(STDOUT,"\n");
       }
-      
       _fprintf(STDOUT, "%d", buffer[i]);
   }
   _fprintf(STDOUT,"\n");
-  return;
+  return 1;
 }
 
-void dateAndTime(){
+int dateAndTime(){
   uint64_t date = sys_dateAndTime(DAY_RTC_ID);
   uint64_t month = sys_dateAndTime(MONTH_RTC_ID);
   uint64_t year = sys_dateAndTime(YEAR_RTC_ID);
@@ -65,24 +73,34 @@ void dateAndTime(){
   uint64_t hour = sys_dateAndTime(HOUR_RTC_ID);
   uint64_t minute = sys_dateAndTime(MINUTE_RTC_ID);
   uint64_t second = sys_dateAndTime(SECOND_RTC_ID);
-  _fprintf(STDOUT,"\n Y el horario de este momento es: %d:%d:%d", hour, minute, second);
+  _fprintf(STDOUT,"\n Y el horario de este momento es: %d:%d:%d\n", hour, minute, second);
+  return 1;
 }
 
-void help(){
+int help(){
   _fprint(STDOUT, "Lista de posibles comandos: \n");
   for (uint8_t i = 0; i < COMMANDS_LENGTH; i++){
     _fprintf(STDOUT, "\t%s\n", commands[i].name);
   }
+
+  _print("Lista de posibles operaciones: \n");
+  _print("\tprogram1 | program2\n");
+  return 1;
 }
 
-void infoReg(){
+int infoReg(){
   static uint64_t registers[16]; //despues arreglar tamaño
-  sys_inforeg(registers, (sizeof(registers)/sizeof(registers[0])));
+  int res = sys_inforeg(registers, (sizeof(uint64_t)*16));
+
+  for(int i = 0 ; i < 16; i++){
+    _fprintf("%x\n\n",registers[i]);
+  }
+  return 1;
 }
 
-void holaMundo() {
-  _fprintf(STDOUT, "hola mundos");
-  return;
+int holaMundo() {
+  _fprintf(STDOUT, "hola mundo");
+  return 1;
 }
 
 command* getCommands(int* size) {

@@ -14,17 +14,18 @@
   '2' para suspender o activar segundo programa
 */
 
-int eventLoop(caller* programs, int programCount) {
-  int endedFirstProgram = 0;
-  int endedSecondProgram = !(programCount == 2);
-  int runFirstProgram = 1;
-  int runSecondProgram = programCount == 2;
+int eventLoop(caller* callers, int programCount) {
+  STATUS firstProgram = RUNNING;
+  STATUS secondProgram = (programCount != 2) ? (ENDED) : (RUNNING);
+
+  // TODO: esperar a poder cancelar
+  int isPipe = programCount == 2;
   if (programCount == 2) {
     sys_toggleMode(1);
     sys_clear(STDOUT);
   }
 
-  while (!(endedFirstProgram && endedSecondProgram)) {
+  while (!(firstProgram == ENDED && secondProgram == ENDED) || isPipe) {
     // FALTA HACER METODO DE CANCELAR EJECUCION
     // int c = 0;
     // if (c == 'c') {
@@ -35,22 +36,26 @@ int eventLoop(caller* programs, int programCount) {
     //   runSecondProgram = !runSecondProgram;
     // }
 
-    if (runFirstProgram && !endedFirstProgram) {
+    if (firstProgram == RUNNING) {
       if (programCount == 2) {
         sys_switchScreen(1);
       }
-      endedFirstProgram = programs[0].module.runner(programs[0].argCount, programs[0].args);
+      int ended = callers[0].program.runner(callers[0].argCount, callers[0].args);
+      if (ended) firstProgram = ENDED;
     }
-    if (runSecondProgram && !endedSecondProgram) {
+    if (secondProgram == RUNNING) {
       if (programCount == 2) {
         sys_switchScreen(2);
       }
-      endedSecondProgram = programs[1].module.runner(programs[0].argCount, programs[0].args);
+      int ended = callers[1].program.runner(callers[1].argCount, callers[1].args);
+      if (ended) secondProgram = ENDED;
     }
   }
+
   if (programCount == 2) {
     sys_switchScreen(0);
     sys_toggleMode(0);
+    sys_clear(STDOUT);
   }
   return 0;
 }
@@ -130,21 +135,22 @@ int runCommandLine(int argCount, char** args) {
     }
 
     if (firstCommandIndex == -1) {
-      _fprintf(STDOUT, "%s no es un comando valido", firstCommand);
+      _fprintf(STDOUT, "%s no es un comando valido\n", firstCommand);
       return 0;
     }
     if (secondCommandIndex == -1) {
-      _fprintf(STDOUT, "%s no es un comando valido", secondCommand);
+      _fprintf(STDOUT, "%s no es un comando valido\n", secondCommand);
       return 0;
     }
 
     caller callers[2];
     callers[0].argCount = pipeIndex - 1;
     callers[0].args = &(args[1]);
-    callers[0].module = commandList[firstCommandIndex];
+    callers[0].program = commandList[firstCommandIndex];
+
     callers[1].argCount = argCount - pipeIndex - 2;
     callers[1].args = &(args[pipeIndex + 1]);
-    callers[1].module = commandList[secondCommandIndex];
+    callers[1].program = commandList[secondCommandIndex];
 
     eventLoop(callers, 2);
     return 1;
@@ -157,21 +163,26 @@ int runCommandLine(int argCount, char** args) {
     }
     
     if (commandIndex == -1) {
-      _fprintf(STDOUT, "%s no es un comando valido", args[0]);
+      _fprintf(STDOUT, "%s no es un comando valido\n", args[0]);
       return 0;
     }
   
     caller c;
     c.argCount = argCount - 1;
     c.args = &(args[1]);
-    c.module = commandList[commandIndex];
+    c.program = commandList[commandIndex];
     eventLoop(&c, 1);
     return 1;
   }
 }
 
+static int init = 1;
+
 void initShell() {
-  clear_screen(1);
+  if (init) {
+    clear_screen(1);
+    init = 0;
+  }
   while (1) {
     sys_showCursor(1);
     _putc(STDOUT, '>');

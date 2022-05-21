@@ -55,7 +55,7 @@ void _fprintf(uint8_t fd, char* format, ...)
                           _fprint(fd, _itoa(i,10));
                           break; 
 
-              case 'o': i = va_arg(arg,unsigned int); //Fetch Octal representation
+              case 'o': i = va_arg(arg, int); //Fetch Octal representation
                           _fprint(fd, _itoa(i,8));
                           break; 
 
@@ -63,7 +63,7 @@ void _fprintf(uint8_t fd, char* format, ...)
                           _fprint(fd, s); 
                           break; 
 
-              case 'x': i = va_arg(arg,unsigned int); //Fetch Hexadecimal representation
+              case 'x': i = va_arg(arg, int); //Fetch Hexadecimal representation
                           _fprint(fd, _itoa(i,16));
                           break;
               default:

@@ -15,10 +15,12 @@ GLOBAL _irq05Handler
 GLOBAL _irq80Handler
 
 GLOBAL _exception0Handler
+GLOBAL _exception6Handler
 
 EXTERN irqDispatcher
 EXTERN exceptionDispatcher
 EXTERN syscallHandler
+EXTERN getStackBase
 
 SECTION .text
 
@@ -87,6 +89,8 @@ SECTION .text
 	out 20h, al
 
 	popState
+
+
 	iretq
 %endmacro
 
@@ -99,6 +103,12 @@ SECTION .text
 	call exceptionDispatcher
 
 	popState
+
+	; call getStackBase
+	; mov [rsp + 3*8], rax ;seteamos rsp a base del stack
+
+	mov rax, 0x400000
+	mov [rsp], rax
 	iretq
 %endmacro
 
@@ -158,7 +168,6 @@ _irq04Handler:
 _irq05Handler:
 	irqHandlerMaster 5
 
-
 _irq80Handler:
 	pushState ;pusheo todos los registros al stack
 	mov r8, rsp ;paso el rsp como parametro nro 5
@@ -170,6 +179,9 @@ _irq80Handler:
 ;Zero Division Exception
 _exception0Handler:
 	exceptionHandler 0
+;Invalid Opcode Exception
+_exception6Handler:
+	exceptionHandler 6
 
 haltcpu:
 	cli

@@ -2,10 +2,14 @@
 #define SHELL_H
 #include <commands.h>
 
+typedef enum {
+  RUNNING, PAUSED, ENDED
+} STATUS;
+
 void initShell();
 
 typedef struct {
-  command module;
+  command program;
   char** args;
   unsigned int argCount;
 } caller;
