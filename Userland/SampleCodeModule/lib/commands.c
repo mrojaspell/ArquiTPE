@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <RTCID.h>
 #include <usersyscalls.h>
+#include <math.h>
 
 int runOnceProgram() {
   _print("corri una vez");
@@ -102,6 +103,85 @@ int holaMundo() {
   _fprintf(STDOUT, "hola mundo");
   return 1;
 }
+
+//defino fiboStruct y fiboPointer
+
+typedef struct{
+  uint64_t n_2;
+  uint64_t n_1;
+  int cantPrinted;
+}fiboS;
+
+typedef fiboS * fiboP;
+
+fiboS newFibonacci(){
+  fiboS toReturn = {1, 1, 0};
+  return toReturn;
+}
+
+int fibonacci(fiboP structPointer){
+
+  int toPrint;
+  if(structPointer->cantPrinted == 0)
+    toPrint = 1;
+  else if(structPointer->cantPrinted == 1)
+    toPrint = 1;
+  else{
+    toPrint = structPointer->n_2 + structPointer->n_1;
+    structPointer->n_2 = structPointer->n_1;
+    structPointer->n_1 = toPrint;
+  }
+
+  _fprintf(STDOUT, "El fibo nro %d es %d\n", ++(structPointer->cantPrinted), toPrint); //fijarse que fprintf imprima nros de 64bit
+  return 0;
+}
+
+uint8_t isPrime(uint64_t num){
+  //double numsqrt = sqrt(num);
+  int isPrime = 1;
+  if(num == 2)
+    return 1;
+  for (uint64_t i = 3; i <= num-1/*numsqrt*/ && isPrime; i+=2){
+    if(num%i == 0)
+      isPrime = 0;
+  }
+  return isPrime;
+}
+
+typedef struct{
+  int cantPrinted;
+  int lastPrime;
+}primeS;
+
+typedef primeS * primeP;
+
+primeS newPrime(){
+  primeS toReturn = {0, -1};
+  return toReturn;
+}
+//PROBLEMAS
+//1)prime|prime
+//2)prime 2 3 5 ...  CANCEL prime 7 11
+int prime(primeP structPointer){
+  int toPrint;
+
+  if(structPointer->lastPrime == -1)
+    toPrint = 2;
+  else if(structPointer->lastPrime == 2)
+    toPrint = 3;
+  else{
+    int i = structPointer->lastPrime;
+    while(!isPrime(i))
+      i += 2;
+  
+  }
+  
+  _fprintf(STDOUT, "El primo nro %d es %d\n", ++(structPointer->cantPrinted), toPrint);
+  structPointer->lastPrime = toPrint;
+  return 0;
+}
+
+
 
 command* getCommands(int* size) {
   *size = COMMANDS_LENGTH;

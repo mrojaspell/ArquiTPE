@@ -35,6 +35,7 @@ int holaMundo();
 int printmem(int argc, char* argv[]);
 int divZero();
 int invalidOpcode();
-
+int fibonacci();
+int prime();
 
 #endif
