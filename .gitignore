@@ -132,3 +132,4 @@ run.sh
 .vscode/settings.json
 .vscode/c_cpp_properties.json
 Image/x64BareBonesImage.img
+.bash_history

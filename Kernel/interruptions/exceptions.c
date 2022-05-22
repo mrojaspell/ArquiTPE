@@ -34,6 +34,7 @@ static void printRegisters(uint64_t *rsp){
 	for(int i = 0; i < 16; i++){
 		printBase(rsp[i], 16);
 	}
+	printChar('\n');
 }
 
 static void invalid_opcode(){

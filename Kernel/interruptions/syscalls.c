@@ -53,7 +53,7 @@ int sys_write(FILE_DESCRIPTOR fd, const char* buffer, uint64_t size) {
     return i;
 }
 
-int syscallHandler(syscall_id rax, void* arg0, void* arg1, void* arg2, uint64_t* rsp) {
+int syscallHandler(syscall_id rax, uint64_t arg0, uint64_t arg1, uint64_t arg2, uint64_t rsp) {
     switch (rax) {
         case SYS_READ:
             return sys_read((FILE_DESCRIPTOR)arg0, (char *)arg1, (size_t)arg2);
@@ -66,7 +66,7 @@ int syscallHandler(syscall_id rax, void* arg0, void* arg1, void* arg2, uint64_t*
             return 0;
             break;
         case SYS_INFOREG:
-            return sys_inforeg((uint64_t *)arg1, (size_t) arg2, rsp);
+            return sys_inforeg((uint64_t *)arg1, (size_t) arg2, (uint64_t*)rsp);
             break;
         case SYS_DATENTIME:
             return sys_dateAndTime((uint64_t) arg0);

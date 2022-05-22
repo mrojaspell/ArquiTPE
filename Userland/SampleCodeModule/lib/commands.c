@@ -30,7 +30,7 @@ int divZero(){
   int aux1 = 1;
   int aux2 = 0;
   int div0 = aux1/aux2;
-  return 1;
+  return div0;
 }
 
 int invalidOpcode(){
@@ -49,9 +49,9 @@ int printmem(int argc, char* argv[]){
   uint64_t memDir = strToHex(address);
 	if(memDir == -1){
     _fprintf(STDOUT,"\nLa direccion ingresada no es alcanzable (%s)",address);
-    return;
+    return 1;
   }
-  _fprintf("\nDump de 32 bytes a partir de la direccion: %s\n\n", address);
+  _fprintf(STDOUT, "\nDump de 32 bytes a partir de la direccion: %s\n\n", address);
 
   uint8_t buffer[DUMP_SIZE];
   sys_printMem(memDir, buffer, DUMP_SIZE);
@@ -90,10 +90,10 @@ int help(){
 
 int infoReg(){
   static uint64_t registers[16]; //despues arreglar tamaño
-  int res = sys_inforeg(registers, (sizeof(uint64_t)*16));
+  sys_inforeg(registers, (sizeof(uint64_t)*16));
 
   for(int i = 0 ; i < 16; i++){
-    _fprintf("%x\n\n",registers[i]);
+    _fprintf(STDOUT, "%x\n\n",registers[i]);
   }
   return 1;
 }

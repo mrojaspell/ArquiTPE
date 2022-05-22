@@ -6,6 +6,7 @@
 #include <console.h>
 #include <naiveConsole.h>
 #include <keyboard.h>
+#include <lib.h>
 
 extern uint8_t text;
 extern uint8_t rodata;

@@ -21,7 +21,7 @@ int sys_dateAndTime(uint64_t id){
 }
 
 int sys_printMem(uint64_t direc, uint8_t * buffer, uint64_t bytes){
-  return _syscall(SYS_PRINTMEM_ID,(uint64_t)direc, (uint8_t*) buffer, (uint64_t)bytes);
+  return _syscall(SYS_PRINTMEM_ID,(uint64_t)direc, (uint64_t) buffer, (uint64_t)bytes);
 }
 
 // Muestra cursor, 0 para desactivar 1 para activar.

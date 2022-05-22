@@ -13,7 +13,8 @@ STATICLIBS=
 all: $(KERNEL)
 
 $(KERNEL): $(LOADEROBJECT) $(OBJECTS) $(STATICLIBS) $(OBJECTS_ASM)
-	$(LD) $(LDFLAGS) -T kernel.ld -o $(KERNEL) $(LOADEROBJECT) $(OBJECTS) $(OBJECTS_ASM) $(STATICLIBS)
+	$(LD) $(LDFLAGS) -T kernel.ld -o kernel.elf  --oformat=elf64-x86-64 $^
+	$(LD) $(LDFLAGS) -T kernel.ld -o  $@ $^
 
 %.o: %.c
 	$(GCC) $(GCCFLAGS) -I./include -c $< -o $@

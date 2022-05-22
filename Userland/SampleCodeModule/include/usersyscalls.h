@@ -27,6 +27,6 @@ int sys_dateAndTime(uint64_t id);
 int sys_showCursor(int active);
 int sys_switchScreen(size_t screen);
 int sys_toggleMode(int mode);
-
+int sys_printMem(uint64_t direc, uint8_t * buffer, uint64_t bytes);
 
 #endif
