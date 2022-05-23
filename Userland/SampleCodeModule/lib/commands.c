@@ -10,12 +10,12 @@
 #include <inforeg.h>
 
 int runOnceProgram() {
-  _print("corri una vez");
+  _print("corri una vez\n");
   return 1;
 }
 
 int runInfiniteProgram() {
-  _print("corro y corro");
+  _print("corro y corro\n");
   return 0;
 }
 

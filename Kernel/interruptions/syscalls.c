@@ -43,7 +43,7 @@ int sys_write(FILE_DESCRIPTOR fd, const char* buffer, uint64_t size) {
         return -1;
     }
 
-    color_t fontColor = (fd == STDERR) ? (RED) : (WHITE);
+    color_t fontColor = (fd == STDERR) ? (RED) : (LGREY);
     int i;
     for (i = 0; i < size && buffer[i]; i += 1) {
         printCharColor(buffer[i], fontColor, BLACK, 1);
