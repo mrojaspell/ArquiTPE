@@ -1,6 +1,6 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
-#define COMMANDS_LENGTH 9
+#define COMMANDS_LENGTH 11
 #define DUMP_SIZE 32
 
 
@@ -12,11 +12,12 @@
 
 typedef struct {
   char *name;
-  int (*runner)(int count, char** args);
+  int (*runner)(int count, char** args, int screenId);
   char *description;
+  void (*initFunction)(int screenId);
 } command;
 
-command* getCommands(int* size);
+command* getCommands();
 
 /*
  Lista de comandos y su estructura
@@ -36,6 +37,7 @@ int printmem(int argc, char* argv[]);
 int divZero();
 int invalidOpcode();
 int fibonacci();
-int prime();
+int prime(int argc, char* argv[], int screenId);
+void emptyInit(int screenId);
 
 #endif
