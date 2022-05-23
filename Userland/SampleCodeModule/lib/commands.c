@@ -7,6 +7,7 @@
 #include <math.h>
 #include <fibonacci.h>
 #include <prime.h>
+#include <inforeg.h>
 
 int runOnceProgram() {
   _print("corri una vez");
@@ -54,10 +55,11 @@ int printmem(int argc, char* argv[]){
     return 1;
   } 
   char* address = argv[0];
+  int longitude = _strlen(address);
 
   // Chequear que strToHex devuelva -1 si no es hex
   uint64_t memDir = strToHex(address);
-	if(memDir == -1){
+	if(memDir == -1 || longitude){
     _fprintf(STDOUT,"\nLa direccion ingresada no es alcanzable (%s)",address);
     return 1;
   }
@@ -66,10 +68,10 @@ int printmem(int argc, char* argv[]){
   uint8_t buffer[DUMP_SIZE];
   sys_printMem(memDir, buffer, DUMP_SIZE);
   for(int i = 0; i < DUMP_SIZE; i++){
-      if(i == 15){
-        _fprintf(STDOUT,"\n");
+      if(i % 8==0){
+        _fprintf(STDOUT,"\n x%d:  ",i);
       }
-      _fprintf(STDOUT, "%d", buffer[i]);
+      _fprintf(STDOUT, "0x%x  ", buffer[i]);
   }
   _fprintf(STDOUT,"\n");
   return 1;
@@ -100,9 +102,10 @@ int help(){
 
 int infoReg(){
   static uint64_t registers[16]; //despues arreglar tamaño
-  sys_inforeg(registers, (sizeof(uint64_t)*16));
+  sys_inforeg(registers);
 
   for(int i = 0 ; i < 16; i++){
+    _fprintf(STDOUT, "%s: ",registerNames[i]);
     _fprintf(STDOUT, "%x\n\n",registers[i]);
   }
   return 1;

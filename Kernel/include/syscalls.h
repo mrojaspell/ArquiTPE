@@ -14,7 +14,7 @@ extern uint8_t _getRTCInfo(uint64_t);
 extern uint8_t _getMem(uint64_t direc);
 
 uint8_t sys_dateAndTime(uint64_t rtcID);
-int sys_inforeg(uint64_t *buffer, size_t count, uint64_t* rsp);
+int sys_inforeg(uint64_t *buffer, uint64_t* rsp);
 void sys_getMem(uint64_t direc, uint8_t * buffer, uint64_t bytes);
 int sys_read(FILE_DESCRIPTOR fd, char* buffer, size_t count);
 int sys_write(FILE_DESCRIPTOR fd, const char* buffer, uint64_t size);

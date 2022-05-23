@@ -12,8 +12,8 @@ int sys_clear(uint8_t fd) {
     return _syscall(SYS_CLEAR_ID, fd, 0, 0);
 }
 
-int sys_inforeg(uint64_t *buffer, size_t count){
-  return _syscall(SYS_INFOREG_ID, 0, (uint64_t)buffer, count);
+int sys_inforeg(uint64_t *buffer){
+  return _syscall(SYS_INFOREG_ID, 0, (uint64_t)buffer,0);
 }
 
 int sys_dateAndTime(uint64_t id){

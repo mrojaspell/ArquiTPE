@@ -11,10 +11,8 @@ uint8_t sys_dateAndTime(uint64_t rtcID){
 	return result;
 }
 
-int sys_inforeg(uint64_t *buffer, size_t count, uint64_t* rsp){
-    if(buffer == NULL || count < REGISTERS*sizeof(uint64_t))
-        return -1;
-
+int sys_inforeg(uint64_t *buffer, uint64_t* rsp){
+    
     for(int i = 0 ; i < REGISTERS ; i++){ //buffer[0] = r15, ... buffer[15] = rax
         buffer[i] = rsp[i];
     }
@@ -66,7 +64,7 @@ int syscallHandler(syscall_id rax, uint64_t arg0, uint64_t arg1, uint64_t arg2, 
             return 0;
             break;
         case SYS_INFOREG:
-            return sys_inforeg((uint64_t *)arg1, (size_t) arg2, (uint64_t*)rsp);
+            return sys_inforeg((uint64_t *)arg1, (uint64_t*)rsp);
             break;
         case SYS_DATENTIME:
             return sys_dateAndTime((uint64_t) arg0);
