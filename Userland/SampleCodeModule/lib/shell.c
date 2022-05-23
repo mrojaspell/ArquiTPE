@@ -18,6 +18,12 @@ int eventLoop(caller* callers, int programCount) {
   STATUS firstProgram = RUNNING;
   STATUS secondProgram = (programCount != 2) ? (ENDED) : (RUNNING);
 
+  if(firstProgram = RUNNING)
+    callers[0].program.initFunction(0);
+
+  if(secondProgram = RUNNING)
+    callers[1].program.initFunction(1);
+
   // TODO: esperar a poder cancelar
   int isPipe = programCount == 2;
   if (programCount == 2) {

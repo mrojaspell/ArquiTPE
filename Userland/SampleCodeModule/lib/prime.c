@@ -3,8 +3,7 @@
 
 // Function to find the square-root of N
 // fijarse si conseguimos una mas eficiente
-int _sqrt(int number)
-{
+int _sqrt(int number){
     int start = 0, end = number;
     int mid;
  
