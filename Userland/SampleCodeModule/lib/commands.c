@@ -55,12 +55,12 @@ int printmem(int argc, char* argv[]){
     return 1;
   } 
   char* address = argv[0];
-  int longitude = _strlen(address);
+  
 
   // Chequear que strToHex devuelva -1 si no es hex
   uint64_t memDir = strToHex(address);
-	if(memDir == -1 || longitude){
-    _fprintf(STDOUT,"\nLa direccion ingresada no es alcanzable (%s)",address);
+	if(memDir == -1 || memDir >= LAST_MEM){
+    _fprintf(STDOUT,"\nLa direccion ingresada no es alcanzable (%s)\n",address);
     return 1;
   }
   _fprintf(STDOUT, "\nDump de 32 bytes a partir de la direccion: %s\n\n", address);
@@ -106,7 +106,7 @@ int infoReg(){
 
   for(int i = 0 ; i < 16; i++){
     _fprintf(STDOUT, "%s: ",registerNames[i]);
-    _fprintf(STDOUT, "%x\n\n",registers[i]);
+    _fprintf(STDOUT, "%x\n",registers[i]);
   }
   return 1;
 }

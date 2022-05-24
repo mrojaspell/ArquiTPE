@@ -2,7 +2,7 @@
 #define COMMANDS_H
 #define COMMANDS_LENGTH 11
 #define DUMP_SIZE 32
-
+#define LAST_MEM 0x80000000
 
 /* 
   Los programas validos son estos:
