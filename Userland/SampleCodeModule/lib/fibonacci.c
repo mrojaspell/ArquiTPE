@@ -13,12 +13,12 @@ void initFibonacci(int screenId){
 int fibonacci(int argc, char* argv[], int screenId){
 
   //sleep casero para debuggear
-  for (size_t i = 0; i < 100000000; i++)
+  for (size_t i = 0; i < 50000000; i++)
   {
     /* code */
   }
 
-  int toPrint;
+  uint64_t toPrint;
   if(fiboState[screenId].cantPrinted == 0)
     toPrint = 1;
   else if(fiboState[screenId].cantPrinted == 1)
@@ -33,6 +33,6 @@ int fibonacci(int argc, char* argv[], int screenId){
   if(fiboState[screenId].n_2 > fiboState[screenId].n_1)
     _fprintf(STDOUT, "OVERFLOW\n\n\n");
 
-  _fprintf(STDOUT, "El fibo nro %d es %d\n", ++(fiboState[screenId].cantPrinted), toPrint); //fijarse que fprintf imprima nros de 64bit
+  _fprintf(STDOUT, "El fibo nro %d es %u\n", ++(fiboState[screenId].cantPrinted), toPrint); //fijarse que fprintf imprima nros de 64bit
   return 0;
 }

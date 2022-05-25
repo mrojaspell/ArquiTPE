@@ -19,7 +19,7 @@ void _putc(uint8_t fd, char c);
 void _fprintf(uint8_t fd, char *,...);              
 int toLower(int chr);
 int strToHex(const char *str);
-char* _itoa(unsigned int, int);      
+char* _itoa(uint64_t, int);      
 long _atoi(const char* s);
 void _print(const char *str);
 int _strcasecmp(const char *str1, const char* str2);

@@ -1,5 +1,6 @@
 #include <ustdlib.h>
 #include <usersyscalls.h>
+#include <stdint.h>
 
 
 int _strlen(const char* str) {
@@ -63,8 +64,11 @@ void _fprintf(uint8_t fd, char* format, ...)
                           _fprint(fd, s); 
                           break; 
 
-              case 'x': i = va_arg(arg, int); //Fetch Hexadecimal representation
+              case 'x': i = va_arg(arg, uint64_t); //Fetch Hexadecimal representation
                           _fprint(fd, _itoa(i,16));
+                          break;
+              case 'u':    //Fetch uint64_t representation
+                          _fprint(fd, _itoa(va_arg(arg, uint64_t), 10));
                           break;
               default:
                           _putc(STDOUT, '%');
@@ -98,19 +102,19 @@ int getChar() {
   return c;
 }
 
-char *_itoa(unsigned int num, int base) 
+char *_itoa(uint64_t num, int base) 
 { 
     static char Representation[]= "0123456789ABCDEF";
-    static char buffer[50]; 
+    static char buffer[128]; 
     char *ptr; 
 
-    ptr = &buffer[49]; 
+    ptr = &buffer[128]; 
     *ptr = '\0'; 
 
     do 
     { 
         *--ptr = Representation[num%base]; 
-        num /= base; 
+        num /= (uint64_t)base; 
     }while(num != 0); 
 
     return(ptr); 
