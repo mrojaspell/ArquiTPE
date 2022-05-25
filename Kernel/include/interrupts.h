@@ -32,6 +32,9 @@ void picMasterMask(uint8_t mask);
 
 void picSlaveMask(uint8_t mask);
 
+void endInterrupt();
+void switchRsp(uint64_t rsp);
+
 //Termina la ejecución de la cpu.
 void haltcpu(void);
 

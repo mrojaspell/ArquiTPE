@@ -58,6 +58,7 @@ void scrollUp() {
   for (int i = 1; i < win.height; i += 1) {
     for (int j = 0; j < win.width; j += 1) {
       *(getPosition(win.start.y + i - 1, win.start.x + j)) = *(getPosition(win.start.y + i, win.start.x + j));
+      *(getPosition(win.start.y + i - 1, win.start.x + j) + 1) = *(getPosition(win.start.y + i, win.start.x + j) + 1);
     }
   }
 

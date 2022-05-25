@@ -6,26 +6,14 @@
 #define KEYBOARD 1
 #define TIMER 0
 
-
-static void int_20();
-static void int_21();
-
-void irqDispatcher(uint64_t irq, uint64_t rsp) {
+void irqDispatcher(uint64_t irq, uint64_t* rsp) {
 	switch (irq) {
 		case TIMER:
-			int_20();
+			timer_handler();
 			break;
 		case KEYBOARD:
-			int_21();
+			keyboardHandler();
 			break;
 	}
 	return;
-}
-
-void int_20() {
-	timer_handler();
-}
-
-void int_21(){
-	keyboardHandler();
 }

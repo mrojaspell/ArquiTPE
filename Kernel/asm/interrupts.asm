@@ -5,6 +5,8 @@ GLOBAL picMasterMask
 GLOBAL picSlaveMask
 GLOBAL haltcpu
 GLOBAL _hlt
+GLOBAL endInterrupt
+GLOBAL switchRsp
 
 GLOBAL _irq00Handler
 GLOBAL _irq01Handler
@@ -80,17 +82,16 @@ SECTION .text
 
 %macro irqHandlerMaster 1
 	pushState
+	mov rbp, rsp
 
 	mov rdi, %1 ; pasaje de parametro
+	mov rsi, rbp ; pasa el puntero de rsp
 	call irqDispatcher
 
 	; signal pic EOI (End of Interrupt)
-	mov al, 20h
-	out 20h, al
-
+	call endInterrupt
+	mov rsp, rbp
 	popState
-
-
 	iretq
 %endmacro
 
@@ -182,6 +183,17 @@ _exception0Handler:
 ;Invalid Opcode Exception
 _exception6Handler:
 	exceptionHandler 6
+
+endInterrupt:
+	push rax
+	mov al, 20h
+	out 20h, al
+	pop rax
+	ret
+
+switchRsp:
+	mov rsp, rdi
+	ret
 
 haltcpu:
 	cli
