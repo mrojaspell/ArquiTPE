@@ -1,6 +1,10 @@
  Prerequisites
 *.d
 
+# Agregados por TheSpackJarrow
+
+compile.sh
+
 # Object files
 *.o
 *.ko
