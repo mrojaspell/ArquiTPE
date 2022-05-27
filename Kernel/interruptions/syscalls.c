@@ -3,6 +3,7 @@
 #include <registerNames.h>
 #include <console.h>
 #include <naiveConsole.h>
+#include <scheduler.h>
 
 
 uint8_t sys_dateAndTime(uint64_t rtcID){
@@ -55,32 +56,24 @@ int syscallHandler(syscall_id rax, uint64_t arg0, uint64_t arg1, uint64_t arg2, 
     switch (rax) {
         case SYS_READ:
             return sys_read((FILE_DESCRIPTOR)arg0, (char *)arg1, (size_t)arg2);
-            break;
         case SYS_WRITE:
             return sys_write((FILE_DESCRIPTOR)arg0, (char *)arg1, (size_t)arg2);
-            break;
         case SYS_CLEAN_SCREEN:
             clearScreen((FILE_DESCRIPTOR)arg0);
             return 0;
-            break;
         case SYS_INFOREG:
             return sys_inforeg((uint64_t *)arg1, (uint64_t*)rsp);
-            break;
         case SYS_DATENTIME:
             return sys_dateAndTime((uint64_t) arg0);
-            break;
         case SYS_PRINTMEM:
             sys_getMem((uint64_t)arg0, (uint8_t *)arg1, (uint64_t) arg2);
             return 0;
-            break;
         case SYS_SET_CURSOR:
             setCursor((int)arg0);
             return 0;
-            break;
         case SYS_SET_SCREEN:
             switchScreens((size_t)arg0);
             return 0;
-            break;
         case SYS_TOGGLE_MODE:
             if (!(size_t)arg0) {
                 initializeSingleScreen();
@@ -88,7 +81,20 @@ int syscallHandler(syscall_id rax, uint64_t arg0, uint64_t arg1, uint64_t arg2, 
                 initializeDualScreen();
             }
             return 0;
-            break;
+        case SYS_START:
+            return startTask((caller *)arg0);
+        case SYS_CHILD:
+            return startChild((caller *)arg0);
+        case SYS_EXIT:
+            return killTask(getPid());
+        case SYS_KILL:
+            return killTask(arg0);
+        case SYS_PAUSE:
+            return pauseTask(arg0);
+        case SYS_RESUME:
+            return resumeTask(arg0);
+        case SYS_GETPID:
+            return getPid();
     }
     return -1;
 }

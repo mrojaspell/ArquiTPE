@@ -46,14 +46,14 @@ int eventLoop(caller* callers, int programCount) {
       if (programCount == 2) {
         sys_switchScreen(1);
       }
-      int ended = callers[0].program.runner(callers[0].argCount, callers[0].args, 1); //checkiar si el screenId que le paso esta bien
+      int ended = callers[0].runner(callers[0].argCount, callers[0].args); //checkiar si el screenId que le paso esta bien
       if (ended) firstProgram = ENDED;
     }
     if (secondProgram == RUNNING) {
       if (programCount == 2) {
         sys_switchScreen(2);
       }
-      int ended = callers[1].program.runner(callers[1].argCount, callers[1].args, 2);
+      int ended = callers[1].runner(callers[1].argCount, callers[1].args);
       if (ended) secondProgram = ENDED;
     }
   }
@@ -153,11 +153,13 @@ int runCommandLine(int argCount, char** args) {
   caller callers[2];
   callers[0].argCount = (pipeIndex != -1) ? (pipeIndex - 1) : (argCount - 1); 
   callers[0].args = &(args[1]);
-  callers[0].program = commandList[firstCommandIndex];
+  callers[0].runner = commandList[firstCommandIndex].runner;
+  callers[0].screenId = (pipeIndex == -1) ? 0 : 1;
 
   callers[1].argCount = argCount - pipeIndex - 2; 
   callers[1].args = &(args[pipeIndex + 2]);
-  callers[1].program = commandList[secondCommandIndex]; // Vale lo mismo que firstCommandIndex si se llama sin pipe
+  callers[1].runner = commandList[secondCommandIndex].runner; // Vale lo mismo que firstCommandIndex si se llama sin pipe
+  callers[1].screenId = 2;
 
   eventLoop(callers, 1 + (pipeIndex != -1));
   return 1;
@@ -165,7 +167,7 @@ int runCommandLine(int argCount, char** args) {
 
 static int init = 1;
 
-void initShell() {
+void runShell() {
   if (init) {
     clear_screen(1);
     init = 0;
@@ -179,4 +181,10 @@ void initShell() {
     sys_showCursor(0);
     runCommandLine(count, args);
   }
+}
+
+void initShell() {
+  caller c = { &runShell, NULL, 0, 0 };
+  sys_start(&c);
+  while(1);
 }

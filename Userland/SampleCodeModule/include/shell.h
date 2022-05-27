@@ -6,12 +6,15 @@ typedef enum {
   RUNNING, PAUSED, ENDED
 } STATUS;
 
+void runShell();
 void initShell();
 
-typedef struct {
-  command program;
-  char** args;
+
+typedef struct caller {
+  int (*runner)(unsigned int count, void** args);
+  void** args;
   unsigned int argCount;
+  unsigned int screenId;
 } caller;
 
 #endif

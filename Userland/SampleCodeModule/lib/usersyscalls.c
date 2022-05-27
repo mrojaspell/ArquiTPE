@@ -39,3 +39,31 @@ int sys_switchScreen(size_t screen) {
 int sys_toggleMode(int mode) {
   return _syscall(SYS_TOGGLEMODE_ID, mode, 0, 0);
 }
+
+int sys_start(caller* function){
+  return _syscall(SYS_START_ID, function, 0, 0);
+}
+
+int sys_child(caller* function){
+  return _syscall(SYS_CHILD_ID, function, 0, 0);
+}
+
+int sys_exit(){
+  return _syscall(SYS_EXIT_ID, 0, 0, 0);
+}
+
+int sys_kill(uint64_t pid){
+  return _syscall(SYS_KILL_ID, pid, 0, 0);
+}
+
+int sys_pause(uint64_t pid){
+  return _syscall(SYS_PAUSE_ID, pid, 0, 0);
+}
+
+int sys_resume(uint64_t pid){
+  return _syscall(SYS_RESUME_ID, pid, 0, 0);
+}
+
+int sys_getPid(){
+  return _syscall(SYS_GETPID_ID, 0, 0, 0);
+}

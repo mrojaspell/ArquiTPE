@@ -11,7 +11,7 @@ typedef struct caller {
   int (*runner)(unsigned int count, void** args);
   void** args;
   unsigned int argCount;
-  int screenId;
+  unsigned int screenId;
 } caller;
 
 typedef struct task {
@@ -22,6 +22,13 @@ typedef struct task {
   uint64_t id;
 } task;
 
+uint64_t switchTask(uint64_t rsp);
+bool startTask(caller* function);
+bool startChild(caller* function);
+bool killTask(uint64_t pid);
+bool pauseTask(uint64_t pid);
+int resumeTask(uint64_t pid);
+uint64_t getPid();
 
 /*
 Switch task(rsp)

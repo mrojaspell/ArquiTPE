@@ -6,7 +6,7 @@
 #include <stdarg.h>
 
 enum {
-  STDIN = 0, STDOUT, STDERR, STDLEFT, STDRIGHT
+  STDIN = 0, STDOUT, STDERR, STDLEFT, STDRIGHT,
 };
 
 #define IS_DIGIT(x) (((x) >= '0' && (x) <= '9'))

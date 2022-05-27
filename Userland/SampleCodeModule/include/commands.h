@@ -12,7 +12,7 @@
 
 typedef struct {
   char *name;
-  int (*runner)(int count, char** args, int screenId);
+  int (*runner)(int count, void** args);
   char *description;
   void (*initFunction)(int screenId);
 } command;

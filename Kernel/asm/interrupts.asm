@@ -80,8 +80,9 @@ SECTION .text
 	pop rax
 %endmacro
 
+
 %macro irqHandlerMaster 1
-	pushState
+	pushState 
 	mov rbp, rsp
 
 	mov rdi, %1 ; pasaje de parametro
@@ -90,6 +91,7 @@ SECTION .text
 
 	; signal pic EOI (End of Interrupt)
 	call endInterrupt
+	mov rbp, rax
 	mov rsp, rbp
 	popState
 	iretq
@@ -192,7 +194,13 @@ endInterrupt:
 	ret
 
 switchRsp:
+	mov rax, rsp
+	add rax, 8 				 ; devuelve el rsp sin direccion de retorno
 	mov rsp, rdi
+	push rbx
+	mov rbx, [rax]
+	mov [rsp + 8], rbx ; chequear esto si explota
+	pop rbx
 	ret
 
 haltcpu:
