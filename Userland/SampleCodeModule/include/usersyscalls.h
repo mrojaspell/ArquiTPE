@@ -2,6 +2,7 @@
 #define USERSYSCALLS_H
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include "shell.h"
 
 enum {
@@ -21,6 +22,7 @@ enum {
   SYS_PAUSE_ID,
   SYS_RESUME_ID,
   SYS_GETPID_ID,
+  SYS_HASCHILD,
 };
 
 
@@ -36,12 +38,13 @@ int sys_showCursor(int active);
 int sys_switchScreen(size_t screen);
 int sys_toggleMode(int mode);
 int sys_printMem(uint64_t direc, uint8_t * buffer, uint64_t bytes);
-int sys_start(caller* function);
-int sys_child(caller* function);
-int sys_exit();
-int sys_kill();
-int sys_pause(uint64_t pid);
-int sys_resume(uint64_t pid);
-int sys_getPid();
+uint64_t sys_start(caller* function);
+uint64_t sys_child(caller* function);
+bool sys_exit();
+bool sys_kill();
+bool sys_pause(uint64_t pid);
+bool sys_resume(uint64_t pid);
+uint64_t sys_getPid();
+bool sys_hasChild();
 
 #endif

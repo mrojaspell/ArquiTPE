@@ -95,6 +95,8 @@ int syscallHandler(syscall_id rax, uint64_t arg0, uint64_t arg1, uint64_t arg2, 
             return resumeTask(arg0);
         case SYS_GETPID:
             return getPid();
+        case SYS_HASCHILD:
+            return currentHasChilds();
     }
     return -1;
 }

@@ -1,5 +1,7 @@
 #include <usersyscalls.h>
 
+
+
 int sys_read(uint8_t fd, char *buffer, size_t count) {
   return _syscall(SYS_READ_ID, fd, (uint64_t)buffer, 1);
 }
@@ -40,30 +42,34 @@ int sys_toggleMode(int mode) {
   return _syscall(SYS_TOGGLEMODE_ID, mode, 0, 0);
 }
 
-int sys_start(caller* function){
+uint64_t sys_start(caller* function){
   return _syscall(SYS_START_ID, function, 0, 0);
 }
 
-int sys_child(caller* function){
+uint64_t sys_child(caller* function){
   return _syscall(SYS_CHILD_ID, function, 0, 0);
 }
 
-int sys_exit(){
+bool sys_exit(){
   return _syscall(SYS_EXIT_ID, 0, 0, 0);
 }
 
-int sys_kill(uint64_t pid){
+bool sys_kill(uint64_t pid){
   return _syscall(SYS_KILL_ID, pid, 0, 0);
 }
 
-int sys_pause(uint64_t pid){
+bool sys_pause(uint64_t pid){
   return _syscall(SYS_PAUSE_ID, pid, 0, 0);
 }
 
-int sys_resume(uint64_t pid){
+bool sys_resume(uint64_t pid){
   return _syscall(SYS_RESUME_ID, pid, 0, 0);
 }
 
-int sys_getPid(){
+uint64_t sys_getPid(){
   return _syscall(SYS_GETPID_ID, 0, 0, 0);
+}
+
+bool sys_hasChild() {
+  return _syscall(SYS_HASCHILD, 0, 0, 0);
 }

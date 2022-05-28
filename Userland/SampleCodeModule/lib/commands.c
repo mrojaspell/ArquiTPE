@@ -11,26 +11,30 @@
 
 int runOnceProgram() {
   _print("corri una vez\n");
+  sys_exit();
   return 1;
 }
 
 int runInfiniteProgram() {
-  _print("corro y corro\n");
+  while(1) {
+    _print("corro y corro\n");
+  }
+  sys_exit();
   return 0;
 }
 
 static command commands[COMMANDS_LENGTH] = {
-  {"test1", &runOnceProgram, "test1", &emptyInit},
-  {"test2", &runInfiniteProgram, "test2", &emptyInit},
-  { "date&time", &dateAndTime, "Imprime la fecha y el horario.", &emptyInit}, 
-  { "divZero", &divZero, "Genera una excepción de dividir por 0", &emptyInit},
-  { "fibonacci", &fibonacci, "Imprime infinitamente la sucesion de Fibonacci", &initFibonacci},
-  { "hello", &holaMundo, "Saluda al mundo.", &emptyInit }, 
-  { "help", &help, "Muestra una lista de los comandos.", &emptyInit }, 
-  { "inforeg", &infoReg, "Imprime los registros con sus valores al llamar esta función.", &emptyInit },
-  { "invalidOpcode", &invalidOpcode, "Genera una excepción de operador invalido", &emptyInit},
-  { "prime", &prime, "Imprime infinitamente numeros primos", &initPrime},
-  { "printmem", &printmem, "Volcado de memoria de 32 bytes a partir de la dirección recibida como  argumento.", &emptyInit},
+  {"test1", &runOnceProgram, "test1", &emptyInit, 0},
+  {"test2", &runInfiniteProgram, "test2", &emptyInit, 1},
+  { "date&time", &dateAndTime, "Imprime la fecha y el horario.", &emptyInit, 0}, 
+  { "divZero", &divZero, "Genera una excepción de dividir por 0", &emptyInit, 0},
+  { "fibonacci", &fibonacci, "Imprime infinitamente la sucesion de Fibonacci", &initFibonacci, 0},
+  { "hello", &holaMundo, "Saluda al mundo.", &emptyInit, 0 }, 
+  { "help", &help, "Muestra una lista de los comandos.", &emptyInit, 0 }, 
+  { "inforeg", &infoReg, "Imprime los registros con sus valores al llamar esta función.", &emptyInit, 0 },
+  { "invalidOpcode", &invalidOpcode, "Genera una excepción de operador invalido", &emptyInit, 0},
+  { "prime", &prime, "Imprime infinitamente numeros primos", &initPrime, 0},
+  { "printmem", &printmem, "Volcado de memoria de 32 bytes a partir de la dirección recibida como  argumento.", &emptyInit, 0},
 };
 
 void emptyInit(int screenId){
@@ -97,6 +101,7 @@ int help(){
 
   _print("Lista de posibles operaciones: \n");
   _print("\tprogram1 | program2\n");
+  sys_exit();
   return 1;
 }
 

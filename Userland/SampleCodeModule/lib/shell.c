@@ -8,66 +8,17 @@
 #define BUFFER_LENGTH 256
 #define MAX_ARGS 32
 
-/* TEMP
-  'c' para volver a modo una pantalla
-  '1' para suspender o activar primer programa
-  '2' para suspender o activar segundo programa
-*/
 
-int eventLoop(caller* callers, int programCount) {
-  STATUS firstProgram = RUNNING;
-  STATUS secondProgram = (programCount != 2) ? (ENDED) : (RUNNING);
-
-  /*if(firstProgram = RUNNING)
-    callers[0].program.initFunction(0);
-
-  if(secondProgram = RUNNING)
-    callers[1].program.initFunction(1);
+void startPausableProgram(unsigned int count, caller** args) {
+  /*
+    CREATE EVENTLISTENER
   */
-  // TODO: esperar a poder cancelar
-  int isPipe = programCount == 2;
-  if (programCount == 2) {
-    sys_toggleMode(1);
-    sys_clear(STDOUT);
-  }
 
-  while (!(firstProgram == ENDED && secondProgram == ENDED) || isPipe) {
-    // FALTA HACER METODO DE CANCELAR EJECUCION
-    // int c = 0;
-    // if (c == 'c') {
-    //   break;
-    // } else if (c == '1') {
-    //   runFirstProgram = !runFirstProgram;
-    // } else if (c == '2') {
-    //   runSecondProgram = !runSecondProgram;
-    // }
+  uint64_t childPid = sys_child(args[0]);
 
-    if (firstProgram == RUNNING) {
-      if (programCount == 2) {
-        sys_switchScreen(1);
-      }
-      int ended = callers[0].runner(callers[0].argCount, callers[0].args); //checkiar si el screenId que le paso esta bien
-      if (ended) firstProgram = ENDED;
-    }
-    if (secondProgram == RUNNING) {
-      if (programCount == 2) {
-        sys_switchScreen(2);
-      }
-      int ended = callers[1].runner(callers[1].argCount, callers[1].args);
-      if (ended) secondProgram = ENDED;
-    }
-  }
-
-  if (programCount == 2) {
-    sys_switchScreen(0);
-    sys_toggleMode(0);
-    sys_clear(STDOUT);
-  }
-  return 0;
+  while(sys_hasChild());
+  sys_exit();
 }
-
-// Devuelve strings con delimitador de ' '.
-// strings es el array de char*
 
 int getCommandLine(char** strings) {
   static char buffer[BUFFER_LENGTH];
@@ -161,17 +112,22 @@ int runCommandLine(int argCount, char** args) {
   callers[1].runner = commandList[secondCommandIndex].runner; // Vale lo mismo que firstCommandIndex si se llama sin pipe
   callers[1].screenId = 2;
 
-  eventLoop(callers, 1 + (pipeIndex != -1));
+  if (pipeIndex == -1) {
+    if (commandList[firstCommandIndex].pausable) {
+      void ** args = { callers };
+      caller pausableCaller = { &startPausableProgram, args, 1, 0 };
+      sys_start(&pausableCaller);
+    } else {
+      sys_start(callers);
+    }
+  }
+
   return 1;
 }
 
-static int init = 1;
+void runShell(unsigned int count, void** args) {
+  clear_screen(1);
 
-void runShell() {
-  if (init) {
-    clear_screen(1);
-    init = 0;
-  }
   while (1) {
     sys_showCursor(1);
     _putc(STDOUT, '>');

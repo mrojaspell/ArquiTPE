@@ -29,6 +29,7 @@ bool killTask(uint64_t pid);
 bool pauseTask(uint64_t pid);
 int resumeTask(uint64_t pid);
 uint64_t getPid();
+bool currentHasChilds();
 
 /*
 Switch task(rsp)

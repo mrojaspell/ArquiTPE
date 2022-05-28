@@ -4,6 +4,8 @@
 #define DUMP_SIZE 32
 #define LAST_MEM 0x80000000
 
+#include <stdbool.h>
+
 /* 
   Los programas validos son estos:
   Que reciban la cantidad de variables, los argumentos en un array de strings
@@ -15,6 +17,7 @@ typedef struct {
   int (*runner)(int count, void** args);
   char *description;
   void (*initFunction)(int screenId);
+  bool pausable;
 } command;
 
 command* getCommands();

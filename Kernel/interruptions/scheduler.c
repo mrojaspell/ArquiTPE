@@ -39,7 +39,7 @@ void initializeFunction(caller* program, int taskIndex) {
 
 uint64_t switchTask(uint64_t rsp) {
   // Si no hay tasks desde el cual cambiar, que continue normalmente
-  if (tasks > 0) {
+  if (tasks > 1) {
     // Guarda el rsp actual
     taskSchedule[currentTask].rsp = rsp;
     currentTask = nextRunnableTask();
@@ -95,6 +95,8 @@ bool startTask(caller* function, uint64_t rsp) {
   bool started = loadTask(function, freeIndex, (tasks == 0) ? 0 : taskSchedule[currentTask].id);
   taskSchedule[freeIndex].status = RUNNING;
 
+  // Cambia la task a correr
+  currentTask = freeIndex;
   // Si el programa es matado antes de hacer sys_exit, nunca vuelve aca. 
   initializeFunction(&(taskSchedule[freeIndex].program), freeIndex);
   return started;
@@ -102,7 +104,16 @@ bool startTask(caller* function, uint64_t rsp) {
 
 bool hasChilds(uint64_t pid) {
   for (int i = 0; i < TASKQUANTITY; i++) {
-    if (taskSchedule[i].parentId == pid) {
+    if (taskSchedule[i].parentId == pid && taskSchedule[i].status != NOTPRESENT) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool currentHasChilds() {
+  for (int i = 0; i < TASKQUANTITY; i += 1) {
+    if (taskSchedule[i].parentId == taskSchedule[currentTask].id && taskSchedule[i].status != NOTPRESENT) {
       return true;
     }
   }
@@ -139,6 +150,7 @@ bool killTask(uint64_t pid) {
   int parentIndex = findTask(taskSchedule[index].parentId);
   if (!hasChilds(taskSchedule[index].parentId)) {
     taskSchedule[parentIndex].status = RUNNING;
+    currentTask = parentIndex;
   }
 
   return true;

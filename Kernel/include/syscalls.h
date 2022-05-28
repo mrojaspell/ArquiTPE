@@ -21,6 +21,7 @@ typedef enum {
   SYS_PAUSE,
   SYS_RESUME,
   SYS_GETPID,
+  SYS_HASCHILD,
 } syscall_id;
 
 #define REGISTERS 16
