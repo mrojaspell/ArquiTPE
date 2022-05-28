@@ -19,7 +19,7 @@ int findTask(uint64_t pid);
 
 int nextRunnableTask() {
   // Si vuelve a la misma task, que termine
-  for (int i = 0; i < TASKQUANTITY; i += 1) {
+  for (int i = 1; i < TASKQUANTITY; i += 1) {
     int index = (i + currentTask) % TASKQUANTITY;
     if (taskSchedule[index].status == RUNNING || taskSchedule[index].status == NOTINITIALIZED) {
       return index;
@@ -97,6 +97,9 @@ bool startTask(caller* function, uint64_t rsp) {
 
   // Cambia la task a correr
   currentTask = freeIndex;
+
+  switchScreens(function->screenId);
+
   // Si el programa es matado antes de hacer sys_exit, nunca vuelve aca. 
   initializeFunction(&(taskSchedule[freeIndex].program), freeIndex);
   return started;

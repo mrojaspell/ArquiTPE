@@ -1,5 +1,6 @@
 GLOBAL _syscall
 GLOBAL _opcodeExp
+GLOBAL _hlt
 section .text
 
 
@@ -52,4 +53,9 @@ _syscall:
 
 _opcodeExp:
 	UD2
+	ret
+
+_hlt:
+	sti
+	hlt
 	ret

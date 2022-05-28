@@ -17,7 +17,6 @@ typedef struct {
   int (*runner)(int count, void** args);
   char *description;
   void (*initFunction)(int screenId);
-  bool pausable;
 } command;
 
 command* getCommands();

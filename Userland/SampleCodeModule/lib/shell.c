@@ -9,14 +9,14 @@
 #define MAX_ARGS 32
 
 
-void startPausableProgram(unsigned int count, caller** args) {
-  /*
-    CREATE EVENTLISTENER
-  */
+void startPausableProgram(unsigned int count, void** args) {
+  caller* c = (caller*)args[0];
 
-  uint64_t childPid = sys_child(args[0]);
+  uint64_t childPid = sys_child(c);
 
-  while(sys_hasChild());
+  while(sys_hasChild()) {
+    _hlt();
+  }
   sys_exit();
 }
 
@@ -113,13 +113,12 @@ int runCommandLine(int argCount, char** args) {
   callers[1].screenId = 2;
 
   if (pipeIndex == -1) {
-    if (commandList[firstCommandIndex].pausable) {
-      void ** args = { callers };
-      caller pausableCaller = { &startPausableProgram, args, 1, 0 };
-      sys_start(&pausableCaller);
-    } else {
-      sys_start(callers);
-    }
+    void* args[1] = { callers };
+
+    caller pausableCaller = { &startPausableProgram, args, 1, 0 };
+    sys_start(&pausableCaller);
+  } else {
+    // HACER PIPE
   }
 
   return 1;
@@ -144,3 +143,16 @@ void initShell() {
   sys_start(&c);
   while(1);
 }
+
+/*
+p1, p2
+
+pipe {
+  startChild(p1)
+  startChild(p2)
+
+  while();
+
+  sys_exit()
+}
+*/
