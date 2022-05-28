@@ -23,7 +23,7 @@ typedef struct task {
 } task;
 
 uint64_t switchTask(uint64_t rsp);
-bool startTask(caller* function);
+bool startTask(caller* function, uint64_t rsp);
 bool startChild(caller* function);
 bool killTask(uint64_t pid);
 bool pauseTask(uint64_t pid);

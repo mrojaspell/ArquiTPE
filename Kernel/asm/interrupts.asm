@@ -7,6 +7,7 @@ GLOBAL haltcpu
 GLOBAL _hlt
 GLOBAL endInterrupt
 GLOBAL switchRsp
+GLOBAL forceReturnRsp
 
 GLOBAL _irq00Handler
 GLOBAL _irq01Handler
@@ -91,8 +92,8 @@ SECTION .text
 
 	; signal pic EOI (End of Interrupt)
 	call endInterrupt
-	mov rbp, rax
-	mov rsp, rbp
+
+	mov rsp, rax
 	popState
 	iretq
 %endmacro
@@ -103,15 +104,12 @@ SECTION .text
 	pushState
 
 	mov rdi, %1 ; pasaje de parametro
+	mov rsi, rsp
 	call exceptionDispatcher
 
+	; Cambia el rsp para ir a otro programa
+	mov rsp, rax
 	popState
-
-	; call getStackBase
-	; mov [rsp + 3*8], rax ;seteamos rsp a base del stack
-
-	mov rax, 0x400000
-	mov [rsp], rax
 	iretq
 %endmacro
 
@@ -155,7 +153,7 @@ _irq00Handler:
 _irq01Handler:
 	irqHandlerMaster 1
 
-;Cascade pic never called
+;Cascade pic never calleduserSample
 _irq02Handler:
 	irqHandlerMaster 2
 
@@ -195,13 +193,20 @@ endInterrupt:
 
 switchRsp:
 	mov rax, rsp
-	add rax, 8 				 ; devuelve el rsp sin direccion de retorno
 	mov rsp, rdi
+	
+	sub rsp, 8
 	push rbx
 	mov rbx, [rax]
-	mov [rsp + 8], rbx ; chequear esto si explota
+	mov [rsp + 8], rbx 
 	pop rbx
 	ret
+
+; Fuerzo a que se vuelva a la funcion adecuada, para el caso que se mata forzadamente el programa que llamo el SampleCodeModule
+forceReturnRsp:
+	mov rsp, rdi
+	popState
+	iretq
 
 haltcpu:
 	cli

@@ -5,6 +5,8 @@
 
 const static uint64_t baseRSP = 0x200000;
 
+static uint64_t sampleCodeModuleRSP;
+
 static uint64_t STARTPID = 1000;
 #define TASKQUANTITY 16
 #define PAGESIZE 1024
@@ -12,33 +14,40 @@ static uint64_t STARTPID = 1000;
 static task taskSchedule[TASKQUANTITY] = {{{0}}};
 static int currentTask = 0;
 static int tasks = 0;
-int findFreeTask();
+int findNextFreeTask();
 int findTask(uint64_t pid);
 
 int nextRunnableTask() {
   // Si vuelve a la misma task, que termine
-  for (int i = (currentTask + 1) % TASKQUANTITY; i != currentTask; i = (i + 1) % TASKQUANTITY) {
-    if (taskSchedule[i].status == RUNNING || taskSchedule[i].status == NOTINITIALIZED) {
-      return i;
+  for (int i = 0; i < TASKQUANTITY; i += 1) {
+    int index = (i + currentTask) % TASKQUANTITY;
+    if (taskSchedule[index].status == RUNNING || taskSchedule[index].status == NOTINITIALIZED) {
+      return index;
     }
   }
   return currentTask;
 }
 
+// Corre la funcion guardandolo en la posicion adecuada del stack. Vuelve a cuando finalmente la funcion termina
+void initializeFunction(caller* program, int taskIndex) {
+  uint64_t prevRsp = switchRsp(taskIndex * PAGESIZE + baseRSP);
+  endInterrupt();
+  program->runner(program->argCount, program->args);
+  switchRsp(prevRsp);
+  return;
+} 
+
 uint64_t switchTask(uint64_t rsp) {
+  // Si no hay tasks desde el cual cambiar, que continue normalmente
   if (tasks > 0) {
-    // Saves current rsp
+    // Guarda el rsp actual
     taskSchedule[currentTask].rsp = rsp;
     currentTask = nextRunnableTask();
     task* curr = &(taskSchedule[currentTask]);
     switchScreens(curr->program.screenId);
     if (curr->status == NOTINITIALIZED) {
       curr->status = RUNNING;
-      endInterrupt();
-      // Guarda la funcion en su correspondiente lugar de stack
-      uint64_t prevRsp = switchRsp(currentTask * PAGESIZE + baseRSP);
-      curr->program.runner(curr->program.argCount, curr->program.args);
-      switchRsp(prevRsp);
+      initializeFunction(&(curr->program), currentTask);
 
       // Si llego aca, entonces termino la funcion de correr, y quiero que corra la siguiente task
       return switchTask(rsp);
@@ -55,25 +64,40 @@ uint64_t getPid() {
   return 0;
 }
 
-bool startChild(caller* function) {
-  int freeIndex = findFreeTask();
-  if (freeIndex == -1) return false;
-  taskSchedule[freeIndex].status = NOTINITIALIZED;
-  taskSchedule[freeIndex].id = STARTPID++;
-  taskSchedule[freeIndex].program = *function;
-  taskSchedule[freeIndex].parentId = (tasks == 0) ? 0 : taskSchedule[currentTask].id;
-  taskSchedule[freeIndex].rsp = 0;
+bool loadTask(caller* function, int position, uint64_t parentId) {
+  if (tasks == TASKQUANTITY) {
+    return false;
+  }
+  taskSchedule[position].status = NOTINITIALIZED;
+  taskSchedule[position].id = STARTPID++;
+  taskSchedule[position].program = *function;
+  taskSchedule[position].parentId = parentId;
+  taskSchedule[position].rsp = 0;
   tasks += 1;
   return true;
 }
 
-bool startTask(caller* function) {
+bool startChild(caller* function) {
+  int freeIndex = findNextFreeTask();
+  return loadTask(function, freeIndex, (tasks == 0) ? 0 : taskSchedule[currentTask].id);
+}
+
+// Comienza una task y para la ejecucion del programa que lo llamo
+bool startTask(caller* function, uint64_t rsp) {
   if (tasks > 0) {
     taskSchedule[currentTask].status = PAUSED;
+    taskSchedule[currentTask].rsp = rsp;
+  } else {
+    // Si no hay tasks y se hizo startTask, significa que se llamo desde el sampleCodeModule
+    sampleCodeModuleRSP = rsp;
   }
+  int freeIndex = findNextFreeTask();
+  bool started = loadTask(function, freeIndex, (tasks == 0) ? 0 : taskSchedule[currentTask].id);
+  taskSchedule[freeIndex].status = RUNNING;
 
-  // QUE PUEDE PASAR ACAAA
-  return startChild(function);
+  // Si el programa es matado antes de hacer sys_exit, nunca vuelve aca. 
+  initializeFunction(&(taskSchedule[freeIndex].program), freeIndex);
+  return started;
 }
 
 bool hasChilds(uint64_t pid) {
@@ -86,7 +110,7 @@ bool hasChilds(uint64_t pid) {
 }
 
 
-int findFreeTask() {
+int findNextFreeTask() {
   for (int i = 0; i < TASKQUANTITY; i++) {
     if (taskSchedule[i].status == NOTPRESENT) return i;
   }
@@ -108,7 +132,8 @@ bool killTask(uint64_t pid) {
   taskSchedule[index].status = NOTPRESENT;
 
   if (taskSchedule[index].parentId == 0) {
-    // Programar task null que haga while (1); -> call syscall exit
+    // Si se mata la funcion que llamo el sampleCodeModule (ej: shell), necesito que vuelva al sampleCodeModule
+    forceReturnRsp(sampleCodeModuleRSP);
     return true;
   }
   int parentIndex = findTask(taskSchedule[index].parentId);
