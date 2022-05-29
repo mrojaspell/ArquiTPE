@@ -29,18 +29,29 @@ static command commands[COMMANDS_LENGTH] = {
   {"test2", &runInfiniteProgram, "test2", &emptyInit },
   { "date&time", &dateAndTime, "Imprime la fecha y el horario.", &emptyInit }, 
   { "divZero", &divZero, "Genera una excepción de dividir por 0", &emptyInit },
-  { "fibonacci", &fibonacci, "Imprime infinitamente la sucesion de Fibonacci", &initFibonacci },
+  { "fibonacci", &fibonacci, "Imprime infinitamente la sucesion de Fibonacci", &emptyInit },
   { "hello", &holaMundo, "Saluda al mundo.", &emptyInit }, 
   { "help", &help, "Muestra una lista de los comandos.", &emptyInit }, 
   { "inforeg", &infoReg, "Imprime los registros con sus valores al llamar esta función.", &emptyInit },
   { "invalidOpcode", &invalidOpcode, "Genera una excepción de operador invalido", &emptyInit },
-  { "prime", &prime, "Imprime infinitamente numeros primos", &initPrime, 0},
+  { "prime", &primes, "Imprime infinitamente numeros primos", &emptyInit, 0},
   { "printmem", &printmem, "Volcado de memoria de 32 bytes a partir de la dirección recibida como  argumento.", &emptyInit, 0},
+  { "wait", &wait, "espera x segs", &emptyInit , 0},
 };
 
 void emptyInit(int screenId){
   return;
 }
+
+int wait(int argc, char* argv[]){
+  int seconds = (int) argv[0];
+  for(int i = 0 ; i < seconds ; i++){
+    _fprintf(STDOUT, "%d\n",i);
+    sys_wait(seconds);
+  }
+  return 1;
+}
+
 
 int divZero(){
   int aux1 = 1;

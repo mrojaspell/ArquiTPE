@@ -26,6 +26,10 @@ int sys_printMem(uint64_t direc, uint8_t * buffer, uint64_t bytes){
   return _syscall(SYS_PRINTMEM_ID,(uint64_t)direc, (uint64_t) buffer, (uint64_t)bytes);
 }
 
+int sys_wait(uint64_t seconds){
+  return _syscall(SYS_WAIT_ID, seconds, 0, 0);
+}
+
 // Muestra cursor, 0 para desactivar 1 para activar.
 int sys_showCursor(int active) {
   return _syscall(SYS_CURSOR_ID, active, 0, 0);

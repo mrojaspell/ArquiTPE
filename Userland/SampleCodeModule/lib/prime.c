@@ -1,6 +1,7 @@
 #include <ustdlib.h>
 #include <prime.h>
-
+#include <usersyscalls.h>
+/*
 // Function to find the square-root of N
 // fijarse si conseguimos una mas eficiente
 int _sqrt(int number){
@@ -80,7 +81,7 @@ int prime(int argc, char* argv[], int screenId){
   //sleep casero para debuggear
   for (size_t i = 0; i < 100000000; i++)
   {
-    /* code */
+     code 
   }
   
   int toPrint;
@@ -104,5 +105,25 @@ int prime(int argc, char* argv[], int screenId){
   //_fprintf(STDOUT, "La raiz de %d es %d\n", primeState[screenId].cantPrinted, _sqrt(primeState[screenId].cantPrinted)); //para testiar el sqrt
   _fprintf(STDOUT, "El primo nro %d es %d\n", ++(primeState[screenId].cantPrinted), toPrint);
   return 0;
+}
+
+*/
+int primes(){
+  int num = 2;
+  int aux = 2;
+  _fprintf(STDOUT, "prime : %d",num);
+  num++;
+  while(1){
+    num += 2;
+    int m = num/2;
+    for(int i = 2 ; i <= m; i++){    
+      if(num % i == 0)  
+        break;  
+    }
+    sys_wait(1);
+    _fprintf(STDOUT, "prime : %d", num);
+  }
+  sys_exit();
+  return num;
 }
 

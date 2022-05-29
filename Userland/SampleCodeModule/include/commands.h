@@ -1,6 +1,6 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
-#define COMMANDS_LENGTH 11
+#define COMMANDS_LENGTH 12
 #define DUMP_SIZE 32
 #define LAST_MEM 0x80000000
 
@@ -41,5 +41,6 @@ int invalidOpcode();
 int fibonacci();
 int prime(int argc, char* argv[], int screenId);
 void emptyInit(int screenId);
+int wait(int argc, char* argv[]);
 
 #endif

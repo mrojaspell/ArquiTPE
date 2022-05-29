@@ -9,6 +9,7 @@ typedef struct{
 typedef primeS * primeP;
 
 void initPrime(int screenId);
-int prime(int argc, char* argv[], int screenId);
+//int prime(int argc, char* argv[], int screenId);
+int primes();
 
 #endif

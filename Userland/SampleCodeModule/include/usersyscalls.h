@@ -23,6 +23,7 @@ enum {
   SYS_RESUME_ID,
   SYS_GETPID_ID,
   SYS_HASCHILD,
+  SYS_WAIT_ID,
 };
 
 
@@ -38,6 +39,7 @@ int sys_showCursor(int active);
 int sys_switchScreen(size_t screen);
 int sys_toggleMode(int mode);
 int sys_printMem(uint64_t direc, uint8_t * buffer, uint64_t bytes);
+int sys_wait(uint64_t seconds);
 uint64_t sys_start(caller* function);
 uint64_t sys_child(caller* function);
 bool sys_exit();

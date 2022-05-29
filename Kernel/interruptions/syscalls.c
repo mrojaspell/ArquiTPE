@@ -4,12 +4,21 @@
 #include <console.h>
 #include <naiveConsole.h>
 #include <scheduler.h>
+#include <time.h>
 
 
 uint8_t sys_dateAndTime(uint64_t rtcID){
 	uint8_t x = _getRTCInfo(rtcID);
 	uint8_t result = ((x / 16) * 10) + (x & 0xf);
 	return result;
+}
+
+void sys_wait(uint64_t seconds){
+    int startingSeconds = seconds_elapsed();
+    int currentSeconds = startingSeconds;
+    while((currentSeconds - startingSeconds) <= seconds){
+        currentSeconds = seconds_elapsed();
+    }
 }
 
 int sys_inforeg(uint64_t *buffer, uint64_t* rsp){
@@ -97,6 +106,9 @@ int syscallHandler(syscall_id rax, uint64_t arg0, uint64_t arg1, uint64_t arg2, 
             return getPid();
         case SYS_HASCHILD:
             return currentHasChilds();
+        case SYS_WAIT:
+            sys_wait((uint64_t)arg0);
+            return 0;
     }
     return -1;
 }
