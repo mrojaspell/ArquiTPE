@@ -31,6 +31,7 @@ int primes(){
   int num = 2;
   _fprintf(STDOUT, "prime : %d\n",num);
   num++;
+  sys_wait(1);
   while(1){
     num += 2;
     if (isPrime(num)) {
