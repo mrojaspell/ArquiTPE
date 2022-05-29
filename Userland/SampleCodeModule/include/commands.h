@@ -39,8 +39,8 @@ int printmem(int argc, char* argv[]);
 int divZero();
 int invalidOpcode();
 int fibonacci();
-int prime(int argc, char* argv[], int screenId);
+int primes();
 void emptyInit(int screenId);
-int wait(int argc, char* argv[]);
+int wait();
 
 #endif

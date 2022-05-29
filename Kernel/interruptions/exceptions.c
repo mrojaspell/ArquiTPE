@@ -20,8 +20,7 @@ uint64_t exceptionDispatcher(int exception, uint64_t rsp) {
 	}
 	uint64_t currentPid = getPid();
 	killTask(currentPid);
-	// printRegisters((uint64_t*) rsp);
-	return switchTask(rsp);
+	return forceSwitchTask();
 }
 
 static int strlen(char * string){

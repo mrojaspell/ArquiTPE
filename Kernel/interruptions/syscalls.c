@@ -5,6 +5,7 @@
 #include <naiveConsole.h>
 #include <scheduler.h>
 #include <time.h>
+#include <interrupts.h>
 
 
 uint8_t sys_dateAndTime(uint64_t rtcID){
@@ -17,6 +18,7 @@ void sys_wait(uint64_t seconds){
     int startingSeconds = seconds_elapsed();
     int currentSeconds = startingSeconds;
     while((currentSeconds - startingSeconds) <= seconds){
+        _hlt();
         currentSeconds = seconds_elapsed();
     }
 }

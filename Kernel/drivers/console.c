@@ -65,6 +65,7 @@ void scrollUp() {
   // Limpia la ultima linea
   for (int j = 0; j < win.width; j += 1) {
     *(getPosition(win.start.y + win.height - 1, j)) = ' ';
+    *(getPosition(win.start.y + win.height - 1, j) + 1) = 0;
   }
   windows[currentWindow].currPos.y -= 1;
 }

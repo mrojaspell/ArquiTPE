@@ -11,10 +11,28 @@
 
 void startPausableProgram(unsigned int count, void** args) {
   caller* c = (caller*)args[0];
-
   uint64_t childPid = sys_child(c);
 
   while(sys_hasChild()) {
+    // IMPLEMENTAR GETKEY
+
+    _hlt();
+  }
+  sys_exit();
+}
+
+void startPipe(unsigned int count, void** args) {
+  caller* leftCaller = (caller*)args[0];
+  caller* rightCaller = (caller*)args[1];
+
+  clear_screen(0);
+  clear_screen(1);
+  clear_screen(2);
+  sys_toggleMode(1);
+  uint64_t leftPid = sys_child(leftCaller);
+  uint64_t rightPid = sys_child(rightCaller);
+
+  while (1) {
     _hlt();
   }
   sys_exit();
@@ -58,7 +76,7 @@ int runCommandLine(int argCount, char** args) {
   int pipeIndex = -1;
 
   // Busca el pipe
-  for (int i = 0; i < argCount && (pipeIndex != -1); i += 1) {
+  for (int i = 0; i < argCount && (pipeIndex == -1); i += 1) {
     if (_strcasecmp(args[i], "|")) {
       pipeIndex = i;
     }
@@ -112,13 +130,16 @@ int runCommandLine(int argCount, char** args) {
   callers[1].runner = commandList[secondCommandIndex].runner; // Vale lo mismo que firstCommandIndex si se llama sin pipe
   callers[1].screenId = 2;
 
+  _fprintf("%d\n", pipeIndex == -1);
   if (pipeIndex == -1) {
     void* args[1] = { callers };
 
     caller pausableCaller = { &startPausableProgram, args, 1, 0 };
     sys_start(&pausableCaller);
   } else {
-    // HACER PIPE
+    void* args[2] = { &(callers[0]), &(callers[1]) };
+    caller pipeCaller = { &startPipe, args, 2, 0 };
+    sys_start(&pipeCaller);
   }
 
   return 1;

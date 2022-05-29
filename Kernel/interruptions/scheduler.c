@@ -28,6 +28,17 @@ int nextRunnableTask() {
   return currentTask;
 }
 
+// Solo devuelve aquellos que ya estan inicializados
+int nextActiveTask() {
+  for (int i = 1; i < TASKQUANTITY; i += 1) {
+    int index = (i + currentTask) % TASKQUANTITY;
+    if (taskSchedule[index].status == RUNNING) {
+      return index;
+    }
+  }
+  return currentTask;
+}
+
 // Corre la funcion guardandolo en la posicion adecuada del stack. Vuelve a cuando finalmente la funcion termina
 void initializeFunction(caller* program, int taskIndex) {
   uint64_t prevRsp = switchRsp(taskIndex * PAGESIZE + baseRSP);
@@ -36,6 +47,14 @@ void initializeFunction(caller* program, int taskIndex) {
   switchRsp(prevRsp);
   return;
 } 
+
+uint64_t forceSwitchTask() {
+  if (tasks == 0) return sampleCodeModuleRSP;
+  currentTask = nextActiveTask();
+  task* curr = &(taskSchedule[currentTask]);
+  switchScreens(curr->program.screenId);
+  return curr->rsp;
+}
 
 uint64_t switchTask(uint64_t rsp) {
   // Si no hay tasks desde el cual cambiar, que continue normalmente

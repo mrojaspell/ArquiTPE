@@ -1,4 +1,3 @@
-//los includes no van en el .h???
 #include <commands.h>
 #include <ustdlib.h>
 #include <stdint.h>
@@ -11,6 +10,7 @@
 
 int runOnceProgram() {
   _print("corri una vez\n");
+
   sys_exit();
   return 1;
 }
@@ -18,7 +18,8 @@ int runOnceProgram() {
 int runInfiniteProgram() {
   while(1) {
     _print("corro y corro\n");
-    _hlt();
+    _print("vuelo y vuelo\n");
+    sys_wait(1);
   }
   sys_exit();
   return 0;
@@ -34,21 +35,17 @@ static command commands[COMMANDS_LENGTH] = {
   { "help", &help, "Muestra una lista de los comandos.", &emptyInit }, 
   { "inforeg", &infoReg, "Imprime los registros con sus valores al llamar esta función.", &emptyInit },
   { "invalidOpcode", &invalidOpcode, "Genera una excepción de operador invalido", &emptyInit },
-  { "prime", &primes, "Imprime infinitamente numeros primos", &emptyInit, 0},
-  { "printmem", &printmem, "Volcado de memoria de 32 bytes a partir de la dirección recibida como  argumento.", &emptyInit, 0},
-  { "wait", &wait, "espera x segs", &emptyInit , 0},
+  { "prime", &primes, "Imprime infinitamente numeros primos", &emptyInit},
+  { "printmem", &printmem, "Volcado de memoria de 32 bytes a partir de la dirección recibida como  argumento.", &emptyInit},
 };
 
 void emptyInit(int screenId){
   return;
 }
 
-int wait(int argc, char* argv[]){
-  int seconds = (int) argv[0];
-  for(int i = 0 ; i < seconds ; i++){
-    _fprintf(STDOUT, "%d\n",i);
-    sys_wait(seconds);
-  }
+int wait() {
+  sys_wait(1);
+  sys_exit();
   return 1;
 }
 
@@ -62,6 +59,7 @@ int divZero(){
 
 int invalidOpcode(){
   _opcodeExp();
+  sys_exit();
   return 1;
 }
 
@@ -90,6 +88,7 @@ int printmem(int argc, char* argv[]){
       _fprintf(STDOUT, "0x%x  ", buffer[i]);
   }
   _fprintf(STDOUT,"\n");
+  sys_exit();
   return 1;
 }
 
@@ -102,6 +101,7 @@ int dateAndTime(){
   uint64_t minute = sys_dateAndTime(MINUTE_RTC_ID);
   uint64_t second = sys_dateAndTime(SECOND_RTC_ID);
   _fprintf(STDOUT,"\n Y el horario de este momento es: %d:%d:%d\n", hour, minute, second);
+  sys_exit();
   return 1;
 }
 
@@ -125,11 +125,13 @@ int infoReg(){
     _fprintf(STDOUT, "%s: ",registerNames[i]);
     _fprintf(STDOUT, "%x\n",registers[i]);
   }
+  sys_exit();
   return 1;
 }
 
 int holaMundo() {
   _fprintf(STDOUT, "hola mundo");
+  sys_exit();
   return 1;
 }
 
