@@ -33,11 +33,11 @@ int primes(){
   num++;
   sys_wait(1);
   while(1){
-    num += 2;
     if (isPrime(num)) {
       _fprintf(STDOUT, "prime : %d\n", num);
       sys_wait(1);
     }
+    num += 2;
   }
   sys_exit();
   return num;

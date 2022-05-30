@@ -118,7 +118,7 @@ int help(){
 }
 
 int infoReg(){
-  static uint64_t registers[16]; //despues arreglar tamaño
+  static uint64_t registers[16];
   sys_inforeg(registers);
 
   for(int i = 0 ; i < 16; i++){
