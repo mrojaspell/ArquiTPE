@@ -18,7 +18,7 @@ int _sqrt(int x) {
 bool isPrime(int num){
   int numsqrt = _sqrt(num);
   int isPrime = 1;
-  if(num == 2)
+  if(num == 2 || num == 3)
     return 1;
   for (int i = 3; i <= numsqrt && isPrime; i+=2){
     if(num%i == 0)
