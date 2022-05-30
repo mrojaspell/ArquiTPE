@@ -6,7 +6,7 @@
 #include <stdarg.h>
 
 enum {
-  STDIN = 0, STDOUT, STDERR, STDLEFT, STDRIGHT
+  STDIN = 0, STDOUT, STDERR, STDLEFT, STDRIGHT,
 };
 
 #define IS_DIGIT(x) (((x) >= '0' && (x) <= '9'))
@@ -23,5 +23,8 @@ char* _itoa(uint64_t, int);
 long _atoi(const char* s);
 void _print(const char *str);
 int _strcasecmp(const char *str1, const char* str2);
+int getKey();
+
+void _hlt();
 
 #endif

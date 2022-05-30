@@ -137,3 +137,4 @@ run.sh
 .vscode/c_cpp_properties.json
 Image/x64BareBonesImage.img
 .bash_history
+.gdb_history

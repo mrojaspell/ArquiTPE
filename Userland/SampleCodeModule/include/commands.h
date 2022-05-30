@@ -1,8 +1,10 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
-#define COMMANDS_LENGTH 11
+#define COMMANDS_LENGTH 12
 #define DUMP_SIZE 32
 #define LAST_MEM 0x80000000
+
+#include <stdbool.h>
 
 /* 
   Los programas validos son estos:
@@ -12,7 +14,7 @@
 
 typedef struct {
   char *name;
-  int (*runner)(int count, char** args, int screenId);
+  int (*runner)(int count, void** args);
   char *description;
   void (*initFunction)(int screenId);
 } command;
@@ -37,7 +39,8 @@ int printmem(int argc, char* argv[]);
 int divZero();
 int invalidOpcode();
 int fibonacci();
-int prime(int argc, char* argv[], int screenId);
+int primes();
 void emptyInit(int screenId);
+int wait();
 
 #endif

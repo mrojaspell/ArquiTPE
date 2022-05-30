@@ -14,9 +14,8 @@ void _print(const char *str) {
 }
 
 void _fprint(uint8_t fd, const char* str) {
-  for (int i = 0; str[i] != '\0'; i += 1) {
-    _putc(fd, str[i]);
-  }
+  unsigned int length = _strlen(str);
+  sys_write(fd, str, length);
 }
 
 // Inspirado de https://stackoverflow.com/questions/1735236/how-to-write-my-own-printf-in-c
@@ -102,7 +101,17 @@ int getChar() {
   return c;
 }
 
-char *_itoa(uint64_t num, int base) 
+int getKey() {
+  int key;
+  int ret;
+
+  do {
+    ret = sys_getKey(STDIN, &key, 1);
+  } while (ret != 1);
+  return key;
+}
+
+char *_itoa(unsigned int num, int base) 
 { 
     static char Representation[]= "0123456789ABCDEF";
     static char buffer[128]; 

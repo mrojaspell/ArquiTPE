@@ -11,6 +11,7 @@ typedef struct{
 typedef fiboS * fiboP;
 
 void initFibonacci(int screenId);
-int fibonacci(int argc, char* argv[], int screenId);
+//int fibonacci(int argc, char* argv[], int screenId);
+int fibonacci();
 
 #endif

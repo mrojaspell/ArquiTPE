@@ -1,4 +1,3 @@
-//los includes no van en el .h???
 #include <commands.h>
 #include <ustdlib.h>
 #include <stdint.h>
@@ -11,31 +10,45 @@
 
 int runOnceProgram() {
   _print("corri una vez\n");
+
+  sys_exit();
   return 1;
 }
 
 int runInfiniteProgram() {
-  _print("corro y corro\n");
+  while(1) {
+    _print("corro y corro\n");
+    _print("vuelo y vuelo\n");
+    sys_wait(1);
+  }
+  sys_exit();
   return 0;
 }
 
 static command commands[COMMANDS_LENGTH] = {
-  {"test1", &runOnceProgram, "test1", &emptyInit},
-  {"test2", &runInfiniteProgram, "test2", &emptyInit},
-  { "date&time", &dateAndTime, "Imprime la fecha y el horario.", &emptyInit}, 
-  { "divZero", &divZero, "Genera una excepción de dividir por 0", &emptyInit},
-  { "fibonacci", &fibonacci, "Imprime infinitamente la sucesion de Fibonacci", &initFibonacci},
+  {"test1", &runOnceProgram, "test1", &emptyInit },
+  {"test2", &runInfiniteProgram, "test2", &emptyInit },
+  { "date&time", &dateAndTime, "Imprime la fecha y el horario.", &emptyInit }, 
+  { "divZero", &divZero, "Genera una excepción de dividir por 0", &emptyInit },
+  { "fibonacci", &fibonacci, "Imprime infinitamente la sucesion de Fibonacci", &emptyInit },
   { "hello", &holaMundo, "Saluda al mundo.", &emptyInit }, 
   { "help", &help, "Muestra una lista de los comandos.", &emptyInit }, 
   { "inforeg", &infoReg, "Imprime los registros con sus valores al llamar esta función.", &emptyInit },
-  { "invalidOpcode", &invalidOpcode, "Genera una excepción de operador invalido", &emptyInit},
-  { "prime", &prime, "Imprime infinitamente numeros primos", &initPrime},
+  { "invalidOpcode", &invalidOpcode, "Genera una excepción de operador invalido", &emptyInit },
+  { "prime", &primes, "Imprime infinitamente numeros primos", &emptyInit},
   { "printmem", &printmem, "Volcado de memoria de 32 bytes a partir de la dirección recibida como  argumento.", &emptyInit},
 };
 
 void emptyInit(int screenId){
   return;
 }
+
+int wait() {
+  sys_wait(1);
+  sys_exit();
+  return 1;
+}
+
 
 int divZero(){
   int aux1 = 1;
@@ -46,6 +59,7 @@ int divZero(){
 
 int invalidOpcode(){
   _opcodeExp();
+  sys_exit();
   return 1;
 }
 
@@ -74,6 +88,7 @@ int printmem(int argc, char* argv[]){
       _fprintf(STDOUT, "0x%x  ", buffer[i]);
   }
   _fprintf(STDOUT,"\n");
+  sys_exit();
   return 1;
 }
 
@@ -86,6 +101,7 @@ int dateAndTime(){
   uint64_t minute = sys_dateAndTime(MINUTE_RTC_ID);
   uint64_t second = sys_dateAndTime(SECOND_RTC_ID);
   _fprintf(STDOUT,"\n Y el horario de este momento es: %d:%d:%d\n", hour, minute, second);
+  sys_exit();
   return 1;
 }
 
@@ -97,22 +113,25 @@ int help(){
 
   _print("Lista de posibles operaciones: \n");
   _print("\tprogram1 | program2\n");
+  sys_exit();
   return 1;
 }
 
 int infoReg(){
-  static uint64_t registers[16]; //despues arreglar tamaño
+  static uint64_t registers[16];
   sys_inforeg(registers);
 
   for(int i = 0 ; i < 16; i++){
     _fprintf(STDOUT, "%s: ",registerNames[i]);
     _fprintf(STDOUT, "%x\n",registers[i]);
   }
+  sys_exit();
   return 1;
 }
 
 int holaMundo() {
   _fprintf(STDOUT, "hola mundo");
+  sys_exit();
   return 1;
 }
 
