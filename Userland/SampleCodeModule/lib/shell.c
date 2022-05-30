@@ -8,18 +8,37 @@
 #define BUFFER_LENGTH 256
 #define MAX_ARGS 32
 
+/*
+  P para pausar y resumir
+  ESC para terminar
+*/
 
 void startPausableProgram(unsigned int count, void** args) {
   caller* c = (caller*)args[0];
   uint64_t childPid = sys_child(c);
 
+  bool paused = 0;
   while(sys_hasChild()) {
-    // IMPLEMENTAR GETKEY
-
-    _hlt();
+    int key = getKey();
+    if (key == P) {
+      if (paused) {
+        sys_resume(childPid);
+      } else {
+        sys_pause(childPid);
+      }
+      paused = !paused;
+    } else if (key == ESCAPE) {
+      break;
+    }
   }
   sys_exit();
 }
+
+/*
+  A para pausar y resumir left
+  D para pausar y resumir right
+  ESC para terminar
+*/
 
 void startPipe(unsigned int count, void** args) {
   caller* leftCaller = (caller*)args[0];
@@ -31,10 +50,30 @@ void startPipe(unsigned int count, void** args) {
   sys_toggleMode(1);
   uint64_t leftPid = sys_child(leftCaller);
   uint64_t rightPid = sys_child(rightCaller);
+  bool pausedLeft = 0, pausedRight = 0;
 
   while (1) {
-    _hlt();
+    int key = getKey();
+    if (key == ESCAPE) {
+      break;
+    } else if (key == A) {
+      if (pausedLeft) {
+        sys_resume(leftPid);
+      } else {
+        sys_pause(leftPid);
+      }
+      pausedLeft = !pausedLeft;
+    } else if (key == D) {
+      if (pausedRight) {
+        sys_resume(rightPid);
+      } else {
+        sys_pause(rightPid);
+      }
+      pausedRight = !pausedRight;
+    }
   }
+  clear_screen(0);
+  sys_toggleMode(0);
   sys_exit();
 }
 
@@ -165,15 +204,3 @@ void initShell() {
   while(1);
 }
 
-/*
-p1, p2
-
-pipe {
-  startChild(p1)
-  startChild(p2)
-
-  while();
-
-  sys_exit()
-}
-*/

@@ -23,7 +23,7 @@ typedef enum {
   SYS_GETPID,
   SYS_HASCHILD,
   SYS_WAIT,
-  SYS_TOGGLEBUFFER
+  SYS_GETKEY
 } syscall_id;
 
 #define REGISTERS 16
@@ -37,7 +37,7 @@ int sys_inforeg(uint64_t *buffer, uint64_t* rsp);
 void sys_getMem(uint64_t direc, uint8_t * buffer, uint64_t bytes);
 int sys_read(FILE_DESCRIPTOR fd, char* buffer, size_t count);
 int sys_write(FILE_DESCRIPTOR fd, const char* buffer, uint64_t size);
-int syscallHandler(syscall_id rax, uint64_t arg0, uint64_t arg1, uint64_t arg2, uint64_t rsp);
+uint64_t syscallHandler(syscall_id rax, uint64_t arg0, uint64_t arg1, uint64_t arg2, uint64_t rsp);
 void sys_wait(uint64_t seconds);
 
 #endif

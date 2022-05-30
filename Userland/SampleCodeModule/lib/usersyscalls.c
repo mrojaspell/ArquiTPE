@@ -78,6 +78,6 @@ bool sys_hasChild() {
   return _syscall(SYS_HASCHILD, 0, 0, 0);
 }
 
-void sys_toggleBuffer(){
-  return _syscall(SYS_TOGGLEBUFFER, 0, 0, 0);
+int sys_getKey(uint8_t fd, int* buffer, size_t count) {
+  return _syscall(SYS_GETKEY_ID, fd, (uint64_t)buffer, 1);
 }

@@ -28,7 +28,7 @@ int nextRunnableTask() {
   return currentTask;
 }
 
-// Solo devuelve aquellos que ya estan inicializados
+// Solo devuelve aquellos que ya estan inicializados, sirve para casos en el cual queres forzar el cambio
 int nextActiveTask() {
   for (int i = 1; i < TASKQUANTITY; i += 1) {
     int index = (i + currentTask) % TASKQUANTITY;
@@ -38,15 +38,6 @@ int nextActiveTask() {
   }
   return currentTask;
 }
-
-// Corre la funcion guardandolo en la posicion adecuada del stack. Vuelve a cuando finalmente la funcion termina
-void initializeFunction(caller* program, int taskIndex) {
-  uint64_t prevRsp = switchRsp(taskIndex * PAGESIZE + baseRSP);
-  endInterrupt();
-  program->runner(program->argCount, program->args);
-  switchRsp(prevRsp);
-  return;
-} 
 
 uint64_t forceSwitchTask() {
   if (tasks == 0) return sampleCodeModuleRSP;
@@ -66,10 +57,13 @@ uint64_t switchTask(uint64_t rsp) {
     switchScreens(curr->program.screenId);
     if (curr->status == NOTINITIALIZED) {
       curr->status = RUNNING;
-      initializeFunction(&(curr->program), currentTask);
-
+      uint64_t prevRsp = switchRsp(currentTask * PAGESIZE + baseRSP);
+      endInterrupt();
+      curr->program.runner(curr->program.argCount, curr->program.args);
+      switchRsp(prevRsp);
+    
       // Si llego aca, entonces termino la funcion de correr, y quiero que corra la siguiente task
-      return switchTask(rsp);
+      return forceSwitchTask();
     }
     return curr->rsp;
   }
@@ -83,9 +77,10 @@ uint64_t getPid() {
   return 0;
 }
 
-bool loadTask(caller* function, int position, uint64_t parentId) {
+// Devuelve el pid de la task creada, sino devuelve overflow
+uint64_t loadTask(caller* function, int position, uint64_t parentId) {
   if (tasks == TASKQUANTITY) {
-    return false;
+    return 0;
   }
   taskSchedule[position].status = NOTINITIALIZED;
   taskSchedule[position].id = STARTPID++;
@@ -93,10 +88,10 @@ bool loadTask(caller* function, int position, uint64_t parentId) {
   taskSchedule[position].parentId = parentId;
   taskSchedule[position].rsp = 0;
   tasks += 1;
-  return true;
+  return taskSchedule[position].id;
 }
 
-bool startChild(caller* function) {
+uint64_t startChild(caller* function) {
   int freeIndex = findNextFreeTask();
   return loadTask(function, freeIndex, (tasks == 0) ? 0 : taskSchedule[currentTask].id);
 }
@@ -111,7 +106,9 @@ bool startTask(caller* function, uint64_t rsp) {
     sampleCodeModuleRSP = rsp;
   }
   int freeIndex = findNextFreeTask();
-  bool started = loadTask(function, freeIndex, (tasks == 0) ? 0 : taskSchedule[currentTask].id);
+  uint64_t started = loadTask(function, freeIndex, (tasks == 0) ? 0 : taskSchedule[currentTask].id);
+  if (!started) return false;
+  
   taskSchedule[freeIndex].status = RUNNING;
 
   // Cambia la task a correr
@@ -119,8 +116,11 @@ bool startTask(caller* function, uint64_t rsp) {
 
   switchScreens(function->screenId);
 
-  // Si el programa es matado antes de hacer sys_exit, nunca vuelve aca. 
-  initializeFunction(&(taskSchedule[freeIndex].program), freeIndex);
+  caller* program = &(taskSchedule[freeIndex].program);
+  uint64_t prevRsp = switchRsp(freeIndex * PAGESIZE + baseRSP);
+  endInterrupt();
+  program->runner(program->argCount, program->args);
+  switchRsp(prevRsp);
   return started;
 }
 

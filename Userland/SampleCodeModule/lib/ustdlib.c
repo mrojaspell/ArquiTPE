@@ -97,10 +97,14 @@ int getChar() {
   return c;
 }
 
-int getScanCode() {
-  int scanCode;
+int getKey() {
+  int key;
   int ret;
-  
+
+  do {
+    ret = sys_getKey(STDIN, &key, 1);
+  } while (ret != 1);
+  return key;
 }
 
 char *_itoa(unsigned int num, int base) 

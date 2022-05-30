@@ -35,10 +35,11 @@ void printKeyMayus(uint8_t key);
 
 void keyboardHandler();
 void loadInBuffer(uint8_t c);
-uint8_t getFromBuffer();
+int getFromBuffer();
 void cleanBuffer();
 int bufferSize();
 int removeFromBuffer();
+void toggleBuffer(actualBuffer buf);
 
 
 #endif

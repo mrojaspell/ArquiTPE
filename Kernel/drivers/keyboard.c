@@ -82,11 +82,8 @@ static bufferStruct bufferArray[2] ={{0}};
 static actualBuffer actualBuf = CHARBUFFER;
 static int isSpecial = 0;
 
-void toggleBuffer(){ //TODO: LLAMAR A ESTA FUNCION
-    if(actualBuf == CHARBUFFER)
-        actualBuf = SCANCODEBUFFER;
-    else
-        actualBuf = CHARBUFFER;
+void toggleBuffer(actualBuffer buf){
+    actualBuf = buf;
 }
 
 static int shiftFlag = 0;
@@ -142,7 +139,7 @@ void loadInBuffer(uint8_t teclahex){
     }
 }
 
-uint8_t getFromBuffer(){
+int getFromBuffer(){
     int c = 0;
 
     if(actualBuf == CHARBUFFER){

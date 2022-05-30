@@ -23,6 +23,7 @@ char* _itoa(unsigned int, int);
 long _atoi(const char* s);
 void _print(const char *str);
 int _strcasecmp(const char *str1, const char* str2);
+int getKey();
 
 void _hlt();
 

@@ -7,10 +7,6 @@
 #include <time.h>
 #include <interrupts.h>
 
-void sys_toggleBuffer(){
-    toggleBuffer();
-}
-
 uint8_t sys_dateAndTime(uint64_t rtcID){
 	uint8_t x = _getRTCInfo(rtcID);
 	uint8_t result = ((x / 16) * 10) + (x & 0xf);
@@ -53,6 +49,17 @@ int sys_read(FILE_DESCRIPTOR fd, char* buffer, size_t count){
     return i;
 }
 
+int sys_readKey(FILE_DESCRIPTOR fd, int* buffer, size_t count){
+    if (buffer == 0 || count == 0 || fd != 0) return -1;
+
+    int i = 0;
+    int c;
+    while (i < count && (c = getFromBuffer()) != -1) {
+        buffer[i++] = c;
+    }
+    return i;
+}
+
 int sys_write(FILE_DESCRIPTOR fd, const char* buffer, uint64_t size) {
     if (buffer == 0 || size == 0 || fd > 4) {
         return -1;
@@ -66,9 +73,10 @@ int sys_write(FILE_DESCRIPTOR fd, const char* buffer, uint64_t size) {
     return i;
 }
 
-int syscallHandler(syscall_id rax, uint64_t arg0, uint64_t arg1, uint64_t arg2, uint64_t rsp) {
+uint64_t syscallHandler(syscall_id rax, uint64_t arg0, uint64_t arg1, uint64_t arg2, uint64_t rsp) {
     switch (rax) {
         case SYS_READ:
+            toggleBuffer(CHARBUFFER);
             return sys_read((FILE_DESCRIPTOR)arg0, (char *)arg1, (size_t)arg2);
         case SYS_WRITE:
             return sys_write((FILE_DESCRIPTOR)arg0, (char *)arg1, (size_t)arg2);
@@ -114,9 +122,9 @@ int syscallHandler(syscall_id rax, uint64_t arg0, uint64_t arg1, uint64_t arg2, 
         case SYS_WAIT:
             sys_wait((uint64_t)arg0);
             return 0;
-        case SYS_TOGGLEBUFFER:
-            sys_toggleBuffer();
-            return 0;
+        case SYS_GETKEY:
+            toggleBuffer(SCANCODEBUFFER);
+            return sys_readKey((FILE_DESCRIPTOR)arg0, (int*)arg1, (size_t)arg2);
     }
     return -1;
 }
