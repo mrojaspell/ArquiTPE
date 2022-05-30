@@ -97,6 +97,12 @@ int getChar() {
   return c;
 }
 
+int getScanCode() {
+  int scanCode;
+  int ret;
+  
+}
+
 char *_itoa(unsigned int num, int base) 
 { 
     static char Representation[]= "0123456789ABCDEF";

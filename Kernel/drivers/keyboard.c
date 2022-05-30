@@ -78,19 +78,17 @@ static char shift_kbd_US [128] =
                 0,  /* All other keys are undefined */
         };
 
-static uint8_t buffer[BUFFER_LENGTH];
-static int shiftFlag = 0;
-static int ctrlFlag = 0;
+static bufferStruct bufferArray[2] ={{0}};
+static actualBuffer actualBuf = CHARBUFFER;
 
-static uint16_t read_i = 0;
-static uint16_t write_i = 0;
-static int overflow = 0; // necesario para chequear que read_i sea menor que write_i ciclicamente
-
-void ctrlAction(uint8_t key, uint64_t rsp){
-    if(key == 'r'){
-        //getRegisterData((uint64_t*) rsp);
-    }
+void toggleBuffer(){ //TODO: LLAMAR A ESTA FUNCION
+    if(actualBuf == CHARBUFFER)
+        actualBuf = SCANCODEBUFFER;
+    else
+        actualBuf = CHARBUFFER;
 }
+
+static int shiftFlag = 0;
 
 //para que no printee cosas raras cuando toco una tecla no imprimible como el control
 int isPrintable(uint8_t teclahex){
@@ -99,73 +97,80 @@ int isPrintable(uint8_t teclahex){
 
 void keyboardHandler(uint64_t rsp){
 
-    static uint8_t teclahex; //quiero que mantengan sus valores
     if (!_hasKey())
         return;
     
-    teclahex = _getKey();
-    if (teclahex == RSHIFT || teclahex == LSHIFT) //si toco shift
-        shiftFlag = 1;
-    else if (teclahex == RSHIFT+RELEASE || teclahex == LSHIFT+RELEASE) //si antes habia tocado shift y ahora toque una letra
-        shiftFlag = 0;
-    else if (teclahex == LCTRL /*|| teclahex == RCTRL*/)
-        ctrlFlag = 1;
-    else if (teclahex == LCTRL+RELEASE /*|| teclahex == RCTRL+RELEASE*/)
-        ctrlFlag = 0;
-    else if (ctrlFlag && teclahex < RELEASE)
-        ctrlAction(kbd_US[teclahex], rsp);
-    else if (shiftFlag && isPrintable(teclahex)) //si es algo imprimible (no de retorno)
-        loadInBuffer(shift_kbd_US[teclahex]);
-    else if (isPrintable(teclahex))
-            loadInBuffer(kbd_US[teclahex]);
+    uint16_t teclahex = _getKey();
+
+    if(actualBuf == CHARBUFFER){
+            if (teclahex == RSHIFT || teclahex == LSHIFT) //si toco shift
+                shiftFlag = 1;
+            else if (teclahex == RSHIFT+RELEASE || teclahex == LSHIFT+RELEASE) //si suelto shift
+                shiftFlag = 0;
+            else if (shiftFlag && isPrintable(teclahex)) //si es algo imprimible (no de retorno)
+                loadInBuffer(shift_kbd_US[teclahex]);
+            else if (isPrintable(teclahex))
+                loadInBuffer(kbd_US[teclahex]);
+    }
+    else if(actualBuf == SCANCODEBUFFER){
+        loadInBuffer(teclahex);
+    }
+
 }
 
-void loadInBuffer(char c){
+void loadInBuffer(uint16_t teclahex){
+    bufferStruct aux = bufferArray[actualBuf];
     // write_i puede seguir escribiendo incluso wrappeando al menos que llegue al read_i
-    if (!overflow || write_i < read_i) {
-        buffer[write_i++] = c;
-        if(write_i == BUFFER_LENGTH){
-            write_i = 0;                // overflow protection
-            overflow = 1;
+    if (!(aux.overflow) || aux.write_i < aux.read_i) {
+        aux.buffer[(aux.write_i)++] = teclahex;
+        if(aux.write_i == BUFFER_LENGTH){
+            aux.write_i = 0;                // overflow protection
+            aux.overflow = 1;
         }
     }
 }
 
-char getChar(){
-    char c = 0;
+uint16_t getFromBuffer(){
+    uint16_t c = 0;
 
-    do{
-        c = removeFromBuffer();
-        blinkCursor();
-        _hlt();
-    } while (c == -1);
-    
-    stopCursor();
+    if(actualBuf == CHARBUFFER){
+        do{
+            c = removeFromBuffer();
+            blinkCursor();
+            _hlt();
+        } while (c == -1);
+        stopCursor();
+    }
+    else if(actualBuf == SCANCODEBUFFER){
+        do{
+            c = removeFromBuffer();
+            _hlt();
+        } while (c == -1);
+    }
+
     return c;
 }
 
 void cleanBuffer(){
-    overflow = 0;
-    write_i = read_i = 0;
+    bufferStruct aux = bufferArray[actualBuf];
+    aux.overflow = 0;
+    aux.write_i = aux.read_i = 0;
 }
 int bufferSize(){
-    return write_i;
+    return bufferArray[actualBuf].write_i;
 }
 
-char removeFromBuffer(){
+uint16_t removeFromBuffer(){
+    bufferStruct aux = bufferArray[actualBuf];
     // Si hay overflow significa que el write_i ya overfloweo una vez, osea hay mas caracteres
-    if(overflow || read_i < write_i){
-        char c = buffer[read_i++];
-        if (read_i == BUFFER_LENGTH) {
-            overflow = 0;
-            read_i = 0;
+    if(aux.overflow || aux.read_i < aux.write_i){
+        uint16_t c = aux.buffer[aux.read_i++];
+        if (aux.read_i == BUFFER_LENGTH) {
+            aux.overflow = 0;
+            aux.read_i = 0;
         }
         return c;
     }
     
     return -1;          //empty buffer
 }
-
-
-
-

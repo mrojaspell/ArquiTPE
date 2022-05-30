@@ -44,7 +44,7 @@ int sys_read(FILE_DESCRIPTOR fd, char* buffer, size_t count){
 
     uint8_t i = 0;
     int c;
-    while (i < count && (c = getChar()) != -1) {
+    while (i < count && (c = getFromBuffer()) != -1) {
         buffer[i++] = c;
     }
     return i;

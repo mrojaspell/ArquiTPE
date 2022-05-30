@@ -17,8 +17,16 @@
 #define ENDKEY 79
 #define BUFFER_LENGTH 256
 
-extern uint8_t _getKey(); //en libasm.asm
+extern uint16_t _getKey(); //en libasm.asm
 extern uint8_t _hasKey();
+
+typedef struct bufferStruct{
+    int write_i, read_i;
+    int overflow; // necesario para chequear que read_i sea menor que write_i ciclicamente
+    uint16_t buffer[BUFFER_LENGTH];
+}bufferStruct;
+
+typedef enum {CHARBUFFER, SCANCODEBUFFER} actualBuffer;
 
 //busca el numero de caracter en mi array y lo imprime
 void printKey(uint8_t key);
@@ -26,11 +34,11 @@ void printKey(uint8_t key);
 void printKeyMayus(uint8_t key);
 
 void keyboardHandler();
-void loadInBuffer(char c);
-char getChar();
+void loadInBuffer(uint16_t c);
+uint16_t getFromBuffer();
 void cleanBuffer();
 int bufferSize();
-char removeFromBuffer();
+uint16_t removeFromBuffer();
 
 
 #endif
