@@ -111,7 +111,7 @@ int getKey() {
   return key;
 }
 
-char *_itoa(unsigned int num, int base) 
+char *_itoa(uint64_t num, int base) 
 { 
     static char Representation[]= "0123456789ABCDEF";
     static char buffer[128]; 
