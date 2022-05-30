@@ -17,7 +17,7 @@
 #define ENDKEY 79
 #define BUFFER_LENGTH 256
 
-extern uint16_t _getKey(); //en libasm.asm
+extern uint8_t _getKey(); //en libasm.asm
 extern uint8_t _hasKey();
 
 typedef struct bufferStruct{
@@ -34,11 +34,11 @@ void printKey(uint8_t key);
 void printKeyMayus(uint8_t key);
 
 void keyboardHandler();
-void loadInBuffer(uint16_t c);
-uint16_t getFromBuffer();
+void loadInBuffer(uint8_t c);
+uint8_t getFromBuffer();
 void cleanBuffer();
 int bufferSize();
-uint16_t removeFromBuffer();
+int removeFromBuffer();
 
 
 #endif

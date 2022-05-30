@@ -48,7 +48,7 @@ _getKey:
     mov rbp, rsp
     mov rax,0 ;limpio el registro
 
-    in ax,0x60 ;agarro la tecla presionada
+    in al,0x60 ;agarro la tecla presionada
 
     mov rsp, rbp
     pop rbp

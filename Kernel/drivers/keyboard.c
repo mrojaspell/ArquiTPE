@@ -80,6 +80,7 @@ static char shift_kbd_US [128] =
 
 static bufferStruct bufferArray[2] ={{0}};
 static actualBuffer actualBuf = CHARBUFFER;
+static int isSpecial = 0;
 
 void toggleBuffer(){ //TODO: LLAMAR A ESTA FUNCION
     if(actualBuf == CHARBUFFER)
@@ -100,9 +101,20 @@ void keyboardHandler(uint64_t rsp){
     if (!_hasKey())
         return;
     
-    uint16_t teclahex = _getKey();
+    uint8_t teclahex = _getKey();
+
+    if(teclahex == 0xE0)
+        isSpecial = 1;
+
+    if(isSpecial){
+        teclahex = _getKey();
+        isSpecial = 0;
+    }
 
     if(actualBuf == CHARBUFFER){
+            //teclahex = teclahex & 0x00FF;
+            if(teclahex == 0xE0)
+                return;
             if (teclahex == RSHIFT || teclahex == LSHIFT) //si toco shift
                 shiftFlag = 1;
             else if (teclahex == RSHIFT+RELEASE || teclahex == LSHIFT+RELEASE) //si suelto shift
@@ -118,20 +130,20 @@ void keyboardHandler(uint64_t rsp){
 
 }
 
-void loadInBuffer(uint16_t teclahex){
-    bufferStruct aux = bufferArray[actualBuf];
+void loadInBuffer(uint8_t teclahex){
+    bufferStruct * aux = &bufferArray[actualBuf];
     // write_i puede seguir escribiendo incluso wrappeando al menos que llegue al read_i
-    if (!(aux.overflow) || aux.write_i < aux.read_i) {
-        aux.buffer[(aux.write_i)++] = teclahex;
-        if(aux.write_i == BUFFER_LENGTH){
-            aux.write_i = 0;                // overflow protection
-            aux.overflow = 1;
+    if (!(aux->overflow) || aux->write_i < aux->read_i) {
+        aux->buffer[(aux->write_i)++] = teclahex;
+        if(aux->write_i == BUFFER_LENGTH){
+            aux->write_i = 0; // overflow protection
+            aux->overflow = 1;
         }
     }
 }
 
-uint16_t getFromBuffer(){
-    uint16_t c = 0;
+uint8_t getFromBuffer(){
+    int c = 0;
 
     if(actualBuf == CHARBUFFER){
         do{
@@ -152,22 +164,22 @@ uint16_t getFromBuffer(){
 }
 
 void cleanBuffer(){
-    bufferStruct aux = bufferArray[actualBuf];
-    aux.overflow = 0;
-    aux.write_i = aux.read_i = 0;
+    bufferStruct * aux = &bufferArray[actualBuf];
+    aux->overflow = 0;
+    aux->write_i = aux->read_i = 0;
 }
 int bufferSize(){
     return bufferArray[actualBuf].write_i;
 }
 
-uint16_t removeFromBuffer(){
-    bufferStruct aux = bufferArray[actualBuf];
+int removeFromBuffer(){
+    bufferStruct * aux = &bufferArray[actualBuf];
     // Si hay overflow significa que el write_i ya overfloweo una vez, osea hay mas caracteres
-    if(aux.overflow || aux.read_i < aux.write_i){
-        uint16_t c = aux.buffer[aux.read_i++];
-        if (aux.read_i == BUFFER_LENGTH) {
-            aux.overflow = 0;
-            aux.read_i = 0;
+    if(aux->overflow || aux->read_i < aux->write_i){
+        uint8_t c = aux->buffer[aux->read_i++];
+        if (aux->read_i == BUFFER_LENGTH) {
+            aux->overflow = 0;
+            aux->read_i = 0;
         }
         return c;
     }
