@@ -77,3 +77,7 @@ uint64_t sys_getPid(){
 bool sys_hasChild() {
   return _syscall(SYS_HASCHILD, 0, 0, 0);
 }
+
+void sys_toggleBuffer(){
+  return _syscall(SYS_TOGGLEBUFFER, 0, 0, 0);
+}

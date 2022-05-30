@@ -24,6 +24,7 @@ enum {
   SYS_GETPID_ID,
   SYS_HASCHILD,
   SYS_WAIT_ID,
+  SYS_TOGGLEBUFFER
 };
 
 

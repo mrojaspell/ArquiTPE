@@ -23,6 +23,7 @@ typedef enum {
   SYS_GETPID,
   SYS_HASCHILD,
   SYS_WAIT,
+  SYS_TOGGLEBUFFER
 } syscall_id;
 
 #define REGISTERS 16
@@ -30,6 +31,7 @@ typedef enum {
 extern uint8_t _getRTCInfo(uint64_t);
 extern uint8_t _getMem(uint64_t direc);
 
+void sys_toggleBuffer();
 uint8_t sys_dateAndTime(uint64_t rtcID);
 int sys_inforeg(uint64_t *buffer, uint64_t* rsp);
 void sys_getMem(uint64_t direc, uint8_t * buffer, uint64_t bytes);

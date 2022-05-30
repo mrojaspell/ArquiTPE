@@ -7,6 +7,9 @@
 #include <time.h>
 #include <interrupts.h>
 
+void sys_toggleBuffer(){
+    toggleBuffer();
+}
 
 uint8_t sys_dateAndTime(uint64_t rtcID){
 	uint8_t x = _getRTCInfo(rtcID);
@@ -110,6 +113,9 @@ int syscallHandler(syscall_id rax, uint64_t arg0, uint64_t arg1, uint64_t arg2, 
             return currentHasChilds();
         case SYS_WAIT:
             sys_wait((uint64_t)arg0);
+            return 0;
+        case SYS_TOGGLEBUFFER:
+            sys_toggleBuffer();
             return 0;
     }
     return -1;
