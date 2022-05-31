@@ -118,11 +118,11 @@ int help(){
 }
 
 int infoReg(){
-  static uint64_t registers[16];
+  static uint64_t registers[TOTAL_REGISTERS];
   sys_inforeg(registers);
 
-  for(int i = 0 ; i < 16; i++){
-    _fprintf(STDOUT, "%s: ",registerNames[i]);
+  for(int i = 0 ; i < TOTAL_REGISTERS; i++){
+    _fprintf(STDOUT, "%s",registerNames[i]);
     _fprintf(STDOUT, "%x\n",registers[i]);
   }
   sys_exit();

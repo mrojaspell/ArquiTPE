@@ -26,7 +26,6 @@ typedef enum {
   SYS_GETKEY
 } syscall_id;
 
-#define REGISTERS 16
 
 extern uint8_t _getRTCInfo(uint64_t);
 extern uint8_t _getMem(uint64_t direc);

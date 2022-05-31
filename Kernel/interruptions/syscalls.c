@@ -1,6 +1,6 @@
 #include <syscalls.h>
 #include <keyboard.h>
-#include <registerNames.h>
+#include <inforeg.h>
 #include <console.h>
 #include <naiveConsole.h>
 #include <scheduler.h>
@@ -24,7 +24,7 @@ void sys_wait(uint64_t seconds){
 
 int sys_inforeg(uint64_t *buffer, uint64_t* rsp){
     
-    for(int i = 0 ; i < REGISTERS ; i++){ //buffer[0] = r15, ... buffer[15] = rax
+    for(int i = 0 ; i < TOTAL_REGISTERS ; i++){ //buffer[0] = r15, ... buffer[15] = rax
         buffer[i] = rsp[i];
     }
 

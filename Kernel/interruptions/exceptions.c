@@ -3,6 +3,7 @@
 #include <syscalls.h>
 #include <naiveConsole.h>
 #include <scheduler.h>
+#include <inforeg.h>
 #define ZERO_EXCEPTION_ID 0
 #define INVALID_OPCODE_ID 6
 
@@ -14,10 +15,10 @@ static void printRegisters(uint64_t* rsp);
 uint64_t exceptionDispatcher(int exception, uint64_t rsp) {
 	if (exception == ZERO_EXCEPTION_ID){
 		zero_division();
-	}
-	else if(exception == INVALID_OPCODE_ID){
+	}else if(exception == INVALID_OPCODE_ID){
 		invalid_opcode();
 	}
+	printRegisters((uint64_t*) rsp);
 	uint64_t currentPid = getPid();
 	killTask(currentPid);
 	return forceSwitchTask();
@@ -33,8 +34,11 @@ static int strlen(char * string){
 }
 
 static void printRegisters(uint64_t *rsp){
-	for(int i = 0; i < 16; i++){
-		printBase(rsp[i], 16);
+	for(int i = 0; i < TOTAL_REGISTERS; i++){
+		sys_write(STDOUT, registerNames[i], strlen(registerNames[i]));
+		printBase(rsp[i],16);
+		printChar('\n');
+
 	}
 	printChar('\n');
 }
