@@ -65,7 +65,9 @@ int invalidOpcode(){
 
 int printmem(int argc, char* argv[]){
   if (argc < 1) {
-    _print("No se dio una direccion de memoria\n");
+    char* error_message = "No se dio una direccion de memoria\n";
+    sys_write(STDERR, error_message, _strlen(error_message));
+    sys_exit();
     return 1;
   } 
   char* address = argv[0];
@@ -74,7 +76,9 @@ int printmem(int argc, char* argv[]){
   // Chequear que strToHex devuelva -1 si no es hex
   uint64_t memDir = strToHex(address);
 	if(memDir == -1 || memDir >= LAST_MEM){
-    _fprintf(STDOUT,"\nLa direccion ingresada no es alcanzable (%s)\n",address);
+    char* error_message = "\nLa direccion ingresada no es alcanzable \n";
+    sys_write(STDERR, error_message,_strlen(error_message));
+    sys_exit();
     return 1;
   }
   _fprintf(STDOUT, "\nDump de 32 bytes a partir de la direccion: %s\n\n", address);

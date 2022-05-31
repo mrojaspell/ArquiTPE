@@ -24,6 +24,7 @@ long _atoi(const char* s);
 void _print(const char *str);
 int _strcasecmp(const char *str1, const char* str2);
 int getKey();
+int _strlen(const char* str);
 
 void _hlt();
 
