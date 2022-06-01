@@ -39,33 +39,28 @@ int nextActiveTask() {
   return currentTask;
 }
 
-uint64_t forceSwitchTask() {
-  if (tasks == 0) return sampleCodeModuleRSP;
-  currentTask = nextActiveTask();
-  task* curr = &(taskSchedule[currentTask]);
-  switchScreens(curr->program.screenId);
-  return curr->rsp;
-}
-
-uint64_t switchTask(uint64_t rsp) {
+uint64_t switchTask(uint64_t rsp, bool forced) {
   // Si no hay tasks desde el cual cambiar, que continue normalmente
   if (tasks > 1) {
     // Guarda el rsp actual
-    taskSchedule[currentTask].rsp = rsp;
-    currentTask = nextRunnableTask();
+    if (!forced) {
+      taskSchedule[currentTask].rsp = rsp;
+      currentTask = nextRunnableTask();
+    } else {
+      // No correr nuevo programa
+      currentTask = nextActiveTask();
+    }
     task* curr = &(taskSchedule[currentTask]);
     switchScreens(curr->program.screenId);
     if (curr->status == NOTINITIALIZED) {
       curr->status = RUNNING;
-      uint64_t prevRsp = switchRsp(currentTask * PAGESIZE + baseRSP);
+      switchRsp(currentTask * PAGESIZE + baseRSP);
       endInterrupt();
-      curr->program.runner(curr->program.argCount, curr->program.args);
-      switchRsp(prevRsp);
-    
-      // Si llego aca, entonces termino la funcion de correr, y quiero que corra la siguiente task
-      return forceSwitchTask();
+      curr->program.runner(curr->program.argCount, curr->program.args);    
+      switchTask(0, true);
     }
-    return curr->rsp;
+    endInterrupt();
+    switchContext(curr->rsp);
   }
   return rsp;
 }
@@ -97,7 +92,7 @@ uint64_t startChild(caller* function) {
 }
 
 // Comienza una task y para la ejecucion del programa que lo llamo
-bool startTask(caller* function, uint64_t rsp) {
+void startTask(caller* function, uint64_t rsp) {
   if (tasks > 0) {
     taskSchedule[currentTask].status = PAUSED;
     taskSchedule[currentTask].rsp = rsp;
@@ -107,7 +102,7 @@ bool startTask(caller* function, uint64_t rsp) {
   }
   int freeIndex = findNextFreeTask();
   uint64_t started = loadTask(function, freeIndex, (tasks == 0) ? 0 : taskSchedule[currentTask].id);
-  if (!started) return false;
+  if (!started) return;
   
   taskSchedule[freeIndex].status = RUNNING;
 
@@ -117,11 +112,10 @@ bool startTask(caller* function, uint64_t rsp) {
   switchScreens(function->screenId);
 
   caller* program = &(taskSchedule[freeIndex].program);
-  uint64_t prevRsp = switchRsp(freeIndex * PAGESIZE + baseRSP);
+  switchRsp(freeIndex * PAGESIZE + baseRSP);
   endInterrupt();
   program->runner(program->argCount, program->args);
-  switchRsp(prevRsp);
-  return started;
+  /* el programa no debe volver a esta posicion, todos los programas deberan hacer sys_exit */
 }
 
 bool hasChilds(uint64_t pid) {
@@ -166,21 +160,26 @@ bool killTask(uint64_t pid) {
 
   if (taskSchedule[index].parentId == 0) {
     // Si se mata la funcion que llamo el sampleCodeModule (ej: shell), necesito que vuelva al sampleCodeModule
-    forceReturnRsp(sampleCodeModuleRSP);
+    switchContext(sampleCodeModuleRSP);
     return true;
   }
   int parentIndex = findTask(taskSchedule[index].parentId);
+  int killedIndex = currentTask;
   if (!hasChilds(taskSchedule[index].parentId)) {
     taskSchedule[parentIndex].status = RUNNING;
     currentTask = parentIndex;
   }
 
+  if (pid == taskSchedule[killedIndex].id) {
+    // Cambiar la task a la siguiente que se puede correr. No queremos que vuelva
+    switchTask(0, true); 
+  }
   return true;
 }
 
 int findTask(uint64_t pid){
     for(int i = 0; i < TASKQUANTITY; i++){
-        if(taskSchedule[i].id == pid && taskSchedule[i].status != NOTINITIALIZED)
+        if(taskSchedule[i].id == pid && taskSchedule[i].status != NOTPRESENT)
             return i;
     }
     return -1;

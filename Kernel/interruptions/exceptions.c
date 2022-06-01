@@ -12,7 +12,7 @@ static void invalid_opcode();
 static void printRegisters(uint64_t* rsp);
 
 
-uint64_t exceptionDispatcher(int exception, uint64_t rsp) {
+void exceptionDispatcher(int exception, uint64_t rsp) {
 	if (exception == ZERO_EXCEPTION_ID){
 		zero_division();
 	}else if(exception == INVALID_OPCODE_ID){
@@ -21,7 +21,6 @@ uint64_t exceptionDispatcher(int exception, uint64_t rsp) {
 	printRegisters((uint64_t*) rsp);
 	uint64_t currentPid = getPid();
 	killTask(currentPid);
-	return forceSwitchTask();
 }
 
 static int strlen(char * string){

@@ -84,6 +84,7 @@ static int isSpecial = 0;
 
 void toggleBuffer(actualBuffer buf){
     actualBuf = buf;
+    cleanBuffer();
 }
 
 static int shiftFlag = 0;

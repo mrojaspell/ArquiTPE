@@ -36,7 +36,7 @@ void endInterrupt();
 
 uint64_t switchRsp(uint64_t rsp);
 
-void forceReturnRsp(uint64_t rsp);
+void switchContext(uint64_t rsp);
 
 //Termina la ejecución de la cpu.
 void haltcpu(void);

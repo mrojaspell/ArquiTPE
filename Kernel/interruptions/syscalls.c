@@ -104,7 +104,8 @@ uint64_t syscallHandler(syscall_id rax, uint64_t arg0, uint64_t arg1, uint64_t a
             }
             return 0;
         case SYS_START:
-            return startTask((caller *)arg0, rsp);
+            startTask((caller *)arg0, rsp);
+            return 0;
         case SYS_CHILD:
             return startChild((caller *)arg0);
         case SYS_EXIT:

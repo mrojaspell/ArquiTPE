@@ -11,7 +11,7 @@ uint64_t irqDispatcher(uint64_t irq, uint64_t rsp) {
 	switch (irq) {
 		case TIMER:
 			timer_handler();
-			rsp = switchTask(rsp);
+			rsp = switchTask(rsp, false);
 			break;
 		case KEYBOARD:
 			keyboardHandler();

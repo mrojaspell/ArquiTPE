@@ -7,7 +7,7 @@ GLOBAL haltcpu
 GLOBAL _hlt
 GLOBAL endInterrupt
 GLOBAL switchRsp
-GLOBAL forceReturnRsp
+GLOBAL switchContext
 
 GLOBAL _irq00Handler
 GLOBAL _irq01Handler
@@ -93,7 +93,6 @@ SECTION .text
 	; signal pic EOI (End of Interrupt)
 	call endInterrupt
 
-	mov rsp, rax
 	popState
 	iretq
 %endmacro
@@ -107,8 +106,6 @@ SECTION .text
 	mov rsi, rsp
 	call exceptionDispatcher
 
-	; Cambia el rsp para ir a otro programa
-	mov rsp, rax
 	popState
 	iretq
 %endmacro
@@ -203,7 +200,7 @@ switchRsp:
 	ret
 
 ; Fuerzo a que se vuelva a la funcion adecuada, para el caso que se mata forzadamente el programa que llamo el SampleCodeModule
-forceReturnRsp:
+switchContext:
 	mov rsp, rdi
 	popState
 	iretq
