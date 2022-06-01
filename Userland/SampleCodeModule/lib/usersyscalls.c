@@ -27,31 +27,31 @@ int sys_printMem(uint64_t direc, uint8_t * buffer, uint64_t bytes){
 }
 
 int sys_wait(uint64_t seconds){
-  return _syscall(SYS_WAIT_ID, seconds, 0, 0);
+  return _syscall(SYS_WAIT_ID, (uint64_t)seconds, 0, 0);
 }
 
 // Muestra cursor, 0 para desactivar 1 para activar.
 int sys_showCursor(int active) {
-  return _syscall(SYS_CURSOR_ID, active, 0, 0);
+  return _syscall(SYS_CURSOR_ID, (uint64_t)active, 0, 0);
 }
 
 // Cambia pantalla, 0 para completa, 1 para izq, 2 para der
 int sys_switchScreen(size_t screen) {
-  return _syscall(SYS_SWITCHSCREEN_ID, screen, 0, 0);
+  return _syscall(SYS_SWITCHSCREEN_ID, (uint64_t)screen, 0, 0);
 }
 
 // Cambia pantalla unica a pantalla doble
 // mode = 0 es unica, mode = 1 es doble
 int sys_toggleMode(int mode) {
-  return _syscall(SYS_TOGGLEMODE_ID, mode, 0, 0);
+  return _syscall(SYS_TOGGLEMODE_ID, (uint64_t)mode, 0, 0);
 }
 
 uint64_t sys_start(caller* function){
-  return _syscall(SYS_START_ID, function, 0, 0);
+  return _syscall(SYS_START_ID, (uint64_t)function, 0, 0);
 }
 
 uint64_t sys_child(caller* function){
-  return _syscall(SYS_CHILD_ID, function, 0, 0);
+  return _syscall(SYS_CHILD_ID, (uint64_t)function, 0, 0);
 }
 
 bool sys_exit(){

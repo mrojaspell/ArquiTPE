@@ -8,46 +8,19 @@
 #include <prime.h>
 #include <inforeg.h>
 
-int runOnceProgram() {
-  _print("corri una vez\n");
-
-  sys_exit();
-  return 1;
-}
-
-int runInfiniteProgram() {
-  while(1) {
-    _print("corro y corro\n");
-    _print("vuelo y vuelo\n");
-    sys_wait(1);
-  }
-  sys_exit();
-  return 0;
-}
 
 static command commands[COMMANDS_LENGTH] = {
-  {"test1", &runOnceProgram, "test1", &emptyInit },
-  {"test2", &runInfiniteProgram, "test2", &emptyInit },
-  { "date&time", &dateAndTime, "Imprime la fecha y el horario.", &emptyInit }, 
-  { "divZero", &divZero, "Genera una excepción de dividir por 0", &emptyInit },
-  { "fibonacci", &fibonacci, "Imprime infinitamente la sucesion de Fibonacci", &emptyInit },
-  { "hello", &holaMundo, "Saluda al mundo.", &emptyInit }, 
-  { "help", &help, "Muestra una lista de los comandos.", &emptyInit }, 
-  { "inforeg", &infoReg, "Imprime los registros con sus valores al llamar esta función.", &emptyInit },
-  { "invalidOpcode", &invalidOpcode, "Genera una excepción de operador invalido", &emptyInit },
-  { "prime", &primes, "Imprime infinitamente numeros primos", &emptyInit},
-  { "printmem", &printmem, "Volcado de memoria de 32 bytes a partir de la dirección recibida como  argumento.", &emptyInit},
+  { "date&time", &dateAndTime }, 
+  { "divZero", &divZero },
+  { "fibonacci", &fibonacci },
+  { "hello", &holaMundo }, 
+  { "help", &help }, 
+  { "inforeg", &infoReg },
+  { "invalidOpcode", &invalidOpcode },
+  { "prime", &primes },
+  { "printmem", &printmem },
+  { "clear", &clearScreen }
 };
-
-void emptyInit(int screenId){
-  return;
-}
-
-int wait() {
-  sys_wait(1);
-  sys_exit();
-  return 1;
-}
 
 
 int divZero(){
@@ -117,12 +90,15 @@ int help(int argc, char* argv[]){
     }
     _print("Lista de posibles operaciones: \n");
     _print("\tprogram1 | program2\n");
-    _print("help \"comando\"  para desplegar informacion detallada de cada comando\nhelp \"operaciones\" para informacion acerca de las operaciones posibles.\n");
-  }else{
-    int index;
-    retrieveInfo(&index, argv[0]);
-    char* mensaje = commandInfo[index];
-    _fprintf(STDOUT,"%s",mensaje);
+    _print("help \"comando\"  para desplegar informacion detallada de cada comando\nhelp operaciones para informacion acerca de las operaciones posibles.\n");
+  } else {
+    int index = getDescriptions(argv[0]);
+    if (index != -1) {
+      char* mensaje = commandInfo[index];
+      _print(mensaje);
+    } else {
+      _fprintf(STDOUT, "%s no existe\n", argv[0]);
+    }
   }
   sys_exit();
     return 1;
@@ -150,8 +126,8 @@ command* getCommands() {
   return commands;
 }
 
-void retrieveInfo(int* index, char* function){
-  int command;
+int getDescriptions(char* function){
+  int command = -1;
   
   for(int i = 0 ; i < COMMANDS_LENGTH; i++){
     if(_strcasecmp(function, commands[i].name)){
@@ -159,7 +135,12 @@ void retrieveInfo(int* index, char* function){
     }
   }
   if(_strcasecmp(function,"operaciones")){
-    command = 11;
+    command = COMMANDS_LENGTH;
   }
-  *index = command;
+  return command;
+}
+
+int clearScreen() {
+  clear_screen(0);
+  sys_exit();
 }

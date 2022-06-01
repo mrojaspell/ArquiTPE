@@ -169,7 +169,6 @@ int runCommandLine(int argCount, char** args) {
   callers[1].runner = commandList[secondCommandIndex].runner; // Vale lo mismo que firstCommandIndex si se llama sin pipe
   callers[1].screenId = 2;
 
-  _fprintf("%d\n", pipeIndex == -1);
   if (pipeIndex == -1) {
     void* args[1] = { callers };
 
