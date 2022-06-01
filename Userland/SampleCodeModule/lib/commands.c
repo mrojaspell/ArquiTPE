@@ -109,16 +109,23 @@ int dateAndTime(){
   return 1;
 }
 
-int help(){
-  _fprint(STDOUT, "Lista de posibles comandos: \n");
-  for (uint8_t i = 0; i < COMMANDS_LENGTH; i++){
-    _fprintf(STDOUT, "\t%s\n", commands[i].name);
+int help(int argc, char* argv[]){
+  if(argc == 0){
+    _fprint(STDOUT, "Lista de posibles comandos: \n");
+    for (uint8_t i = 0; i < COMMANDS_LENGTH; i++){
+      _fprintf(STDOUT, "\t%s\n", commands[i].name);
+    }
+    _print("Lista de posibles operaciones: \n");
+    _print("\tprogram1 | program2\n");
+    _print("help \"comando\"  para desplegar informacion detallada de cada comando\nhelp \"operaciones\" para informacion acerca de las operaciones posibles.\n");
+  }else{
+    int index;
+    retrieveInfo(&index, argv[0]);
+    char* mensaje = commandInfo[index];
+    _fprintf(STDOUT,"%s",mensaje);
   }
-
-  _print("Lista de posibles operaciones: \n");
-  _print("\tprogram1 | program2\n");
   sys_exit();
-  return 1;
+    return 1;
 }
 
 int infoReg(){
@@ -141,4 +148,18 @@ int holaMundo() {
 
 command* getCommands() {
   return commands;
+}
+
+void retrieveInfo(int* index, char* function){
+  int command;
+  
+  for(int i = 0 ; i < COMMANDS_LENGTH; i++){
+    if(_strcasecmp(function, commands[i].name)){
+        command = i;
+    }
+  }
+  if(_strcasecmp(function,"operaciones")){
+    command = 11;
+  }
+  *index = command;
 }

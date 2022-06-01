@@ -29,6 +29,21 @@ command* getCommands();
  } 
 */
 
+static char* commandInfo[COMMANDS_LENGTH] = { 
+                          "test1: corre un programa finito\n",
+                          "test2: corre un programa infinito\n",  
+                          "date&time : Imprime en patalla la fecha del ano corriente y horario en que fue\nllamado.",
+                          "divzero: Realiza una division por 0. Lanza una excepcion e imprime una captura de los registros al momento de ejecucion.\n",
+                          "fibonacci: Imprime la secuencia de fibonacci infinitamente hasta que se pause o se termine su ejecucion.\n",
+                          "hello: Imprime un saludo al usuario.\n",
+                          "help: Imprime una lista detallada de los comandos  y modulos ejecutables del\nprograma.\n",
+                          "inforeg: Imprime una captura de los registros al momento de ser ejecutada la\nfuncion.\n",
+                          "invalidOpcode: Lanza la excepcion de invalid operand code e imprime los\nregistros al momento de ejecucion.\n",
+                          "prime: imprime numeros primos infinitamente hasta que se pause o se termine su\nejecucion.\n",
+                          "printmem: Recibe como argumento una direccion de memoria no superior a\n80000000h y luego imprime los proximos 32bytes de memoria adyacentes a la\ndireccion dada.\n",
+                          "operaciones: usando la operacion | se puede correr dos funciones al mismo\ntiempo. Para terminar la ejecucion de un programa: \"esc\". Para pausar un\nprograma: \"p\", resumir: \"r\". Mientras se usa la operacion \"|\", pausar y resumir\nfuncion en pantalla izquierda \"a\", derecha \"a\".\n",
+};
+
 extern int _opcodeExp();
 
 int dateAndTime();
@@ -42,5 +57,6 @@ int fibonacci();
 int primes();
 void emptyInit(int screenId);
 int wait();
+void retrieveInfo(int* index, char* function);
 
 #endif
