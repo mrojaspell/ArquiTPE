@@ -33,7 +33,7 @@ static char* commandInfo[COMMANDS_LENGTH + 1] = {
                           "fibonacci: Imprime la secuencia de fibonacci infinitamente hasta que se pause o se termine su ejecucion.\n",
                           "hello: Imprime un saludo al usuario.\n",
                           "help: Imprime una lista detallada de los comandos  y modulos ejecutables del\nprograma.\n",
-                          "inforeg: Imprime una captura de los registros al momento de ser ejecutada la\nfuncion.\n",
+                          "inforeg: Imprime los registros registros capturados al presionar ctrl + r.\n",
                           "invalidOpcode: Lanza la excepcion de invalid operand code e imprime los\nregistros al momento de ejecucion.\n",
                           "prime: imprime numeros primos infinitamente hasta que se pause o se termine su\nejecucion.\n",
                           "printmem: Recibe como argumento una direccion de memoria no superior a\n80000000h y luego imprime los proximos 32bytes de memoria adyacentes a la\ndireccion dada.\n",

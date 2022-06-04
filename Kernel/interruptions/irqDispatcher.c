@@ -14,7 +14,7 @@ uint64_t irqDispatcher(uint64_t irq, uint64_t rsp) {
 			rsp = switchTask(rsp, false);
 			break;
 		case KEYBOARD:
-			keyboardHandler();
+			keyboardHandler(rsp);
 			break;
 	}
 	return rsp;

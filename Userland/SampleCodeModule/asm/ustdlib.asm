@@ -54,8 +54,3 @@ _syscall:
 _opcodeExp:
 	UD2
 	ret
-
-_hlt:
-	sti
-	hlt
-	ret

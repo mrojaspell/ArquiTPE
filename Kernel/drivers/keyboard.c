@@ -2,6 +2,7 @@
 #include <console.h>
 #include <naiveConsole.h>
 #include <interrupts.h>
+#include <syscalls.h>
 
 
 //estas tablas de abajo las dejamos por las dudas pero borrar al final del trabajo    
@@ -88,6 +89,7 @@ void toggleBuffer(actualBuffer buf){
 }
 
 static int shiftFlag = 0;
+static int controlFlag = 0;
 
 //para que no printee cosas raras cuando toco una tecla no imprimible como el control
 int isPrintable(uint8_t teclahex){
@@ -117,6 +119,14 @@ void keyboardHandler(uint64_t rsp){
                 shiftFlag = 1;
             else if (teclahex == RSHIFT+RELEASE || teclahex == LSHIFT+RELEASE) //si suelto shift
                 shiftFlag = 0;
+            else if(teclahex == LCTRL)
+                controlFlag = 1;
+            else if(teclahex == LCTRL + RELEASE)
+                controlFlag = 0;
+            else if(controlFlag && (kbd_US[teclahex]=='r')){
+                snapshotRegisters((uint64_t*) rsp);
+                controlFlag = 0;
+            }
             else if (shiftFlag && isPrintable(teclahex)) //si es algo imprimible (no de retorno)
                 loadInBuffer(shift_kbd_US[teclahex]);
             else if (isPrintable(teclahex))

@@ -7,6 +7,8 @@
 #include <time.h>
 #include <interrupts.h>
 
+static uint64_t registers[TOTAL_REGISTERS] = {0};
+
 uint8_t sys_dateAndTime(uint64_t rtcID){
 	uint8_t x = _getRTCInfo(rtcID);
 	uint8_t result = ((x / 16) * 10) + (x & 0xf);
@@ -25,10 +27,18 @@ void sys_wait(uint64_t seconds){
 int sys_inforeg(uint64_t *buffer, uint64_t* rsp){
     
     for(int i = 0 ; i < TOTAL_REGISTERS ; i++){ //buffer[0] = r15, ... buffer[15] = rax
-        buffer[i] = rsp[i];
+        buffer[i] = registers[i];
     }
 
     return 0;
+}
+
+void snapshotRegisters(uint64_t* rsp){
+    for(int i = 0 ; i < TOTAL_REGISTERS ; i++){
+        registers[i] = rsp[i];
+        if(i == 16)
+            registers[i] = rsp[i+0x00000002];
+    }
 }
 
 void sys_getMem(uint64_t direc, uint8_t * buffer, uint64_t bytes){
