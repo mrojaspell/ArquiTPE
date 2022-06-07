@@ -116,7 +116,7 @@ void startTask(caller* function, uint64_t rsp) {
   switchRsp(freeIndex * PAGESIZE + baseRSP);
   endInterrupt();
   program->runner(program->argCount, program->args);
-  /* el programa no debe volver a esta posicion, todos los programas deberan hacer sys_exit */
+  switchTask(0, true);
 }
 
 bool hasChilds(uint64_t pid) {
