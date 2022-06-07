@@ -2,7 +2,7 @@
 #include <fibonacci.h>
 #include <usersyscalls.h>
 
-int fibonacci(){
+void fibonacci(){
   uint64_t a = 0;
   uint64_t b = 1;
   uint64_t c;
@@ -19,5 +19,4 @@ int fibonacci(){
     _fprintf(STDOUT,"n %d: %u\n",count ,c);
   }
   sys_exit();
-  return c;
 }
