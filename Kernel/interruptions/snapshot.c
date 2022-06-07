@@ -1,7 +1,7 @@
 #include <snapshot.h>
 #include <syscalls.h>
 #include <console.h>
-#include <aux.h>
+#include <string.h>
 
 static char* registerNames[] = {
   "R15: ", "R14: ", "R13: ", "R12: ", "R11: ", "R10: ",

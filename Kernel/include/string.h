@@ -1,5 +1,5 @@
-#ifndef AUX_H
-#define AUX_H
+#ifndef STRING_H
+#define STRING_H
 
 int strlen(char * string);
 

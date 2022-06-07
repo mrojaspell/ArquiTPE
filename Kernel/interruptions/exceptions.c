@@ -4,7 +4,7 @@
 #include <naiveConsole.h>
 #include <scheduler.h>
 #include <snapshot.h>
-#include <aux.h>
+#include <string.h>
 
 #define ZERO_EXCEPTION_ID 0
 #define INVALID_OPCODE_ID 6

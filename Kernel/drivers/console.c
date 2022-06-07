@@ -2,7 +2,7 @@
 #include <colors.h>
 #include <naiveConsole.h>
 #include <time.h>
-#include <aux.h>
+#include <string.h>
 
 // Puntero a memoria del dispositivo de video
 static uint8_t * const video = (uint8_t*)0xB8000;
