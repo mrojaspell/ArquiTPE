@@ -42,6 +42,8 @@ void setCursor(int active);
 void switchScreens(size_t screen);
 void initializeSingleScreen();
 void initializeDualScreen();
+void printCheese();
+void printCheeseOs();
 
 #endif
 

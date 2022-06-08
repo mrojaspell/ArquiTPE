@@ -31,6 +31,33 @@ static int strlen(char * string){
 	return i;
 }
 
+void printCheeseOs(){
+print("    __  __ __    ___    ___   _____   ___          ___    _____", 63);
+print("   /  ]|  |  |  /  _]  /  _] / ___/  /  _]        /   \\  / ___/", 63);
+print("  /  / |  |  | /  [_  /  [_ (   \\_  /  [_  _____ |     |(   \\_ ", 63);
+print(" /  /  |  _  ||    _]|    _] \\__  ||    _]|     ||  O  | \\__  |", 63);
+print("/   \\_ |  |  ||   [_ |   [_  /  \\ ||   [_ |_____||     | /  \\ |", 63);
+print("\\     ||  |  ||     ||     | \\    ||     |       |     | \\    |", 63);
+print(" \\____||__|__||_____||_____|  \\___||_____|        \\___/   \\___|", 63);
+newLine();
+}
+
+void printCheese(){
+  newLine();
+  print("    _--\"-.           ", 21);
+  print(" .-\"      \"-.        ", 21);
+  print("|\"\"--..      \'-.     ", 21);
+  print("|      \"\"--..   \'-.  ", 21);
+  print("|.-. .-\".    \"\"--..\".", 21);
+  print("|\'./  -\'  .-.      | ", 21);
+  print("|      .-. \'.-\'   .-\'", 21);
+  print("\'--..  \'.\'    .-  -. ", 21);
+  print("     \"\"--..   \'_\'   :", 21);
+  print("           \"\"--..   |", 21);
+  print("                 \"\"-\'", 21);
+  newLine();
+}
+
 
 static int currentWindow = 0;
 static uint32_t uintToBase(uint64_t value, char * buffer, uint32_t base);
@@ -178,17 +205,10 @@ void setCursor(int active) {
 
 void blinkCursor() {
   if (cursorActive) {
-    int change = 0;
-    if (!change && (ticks_elapsed() % 9 == 0)) {
-      change = 1;
-      printCharColor('_', WHITE, BLACK, 0);
-      if (ticks_elapsed() % 18 == 0) {
+    if(ticks_elapsed() % 18 == 0)
         printCharColor(' ', WHITE, BLACK, 0);
-      }
-      if (change && ticks_elapsed() % 6 != 0) {
-        change = 0;
-      }
-    }
+    else if(ticks_elapsed() % 9 == 0)
+        printCharColor('_', WHITE, BLACK, 0);
   }
 }
 

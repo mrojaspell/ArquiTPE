@@ -100,9 +100,12 @@ int main()
 	ncPrint((char*)sampleDataModuleAddress);
 	ncNewline();
 
+	ncClear();
+	printCheeseOs();
+	printCheese();
+
 	ncPrint("Press enter to log in\n");
-	int c;
-	while((c = getFromBuffer()) != '\n');
+	while(getFromBuffer() != '\n');
 
   ((EntryPoint)sampleCodeModuleAddress)();
 	return 0;

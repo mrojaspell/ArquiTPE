@@ -133,7 +133,7 @@ long _atoi(const char *str) {
   long res = 0;
   int i = 0;
 
-  for (; str[i] == ' ' && str[i] != '\0'; i += 1); // elimino espacios en blanco
+  for (; str[i] == ' '; i += 1); // elimino espacios en blanco
   while (str[i] && IS_DIGIT(str[i])) {
     res = res * 10 + (str[i] - '0');
     i += 1;
