@@ -39,7 +39,8 @@ static char* commandInfo[COMMANDS_LENGTH + 1] = {
 void divZero(){
   int aux1 = 1;
   int aux2 = 0;
-  aux1/aux2;
+  int o = aux1/aux2;
+  sys_exit();
 }
 
 void invalidOpcode(){
@@ -123,7 +124,7 @@ void infoReg(){
 }
 
 void holaMundo() {
-  _fprintf(STDOUT, "hola mundo");
+  _print("hola mundo\n");
   sys_exit();
 }
 

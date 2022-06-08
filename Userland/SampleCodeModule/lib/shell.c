@@ -166,7 +166,7 @@ int runCommandLine(int argCount, char** args) {
 
   callers[1].argCount = argCount - pipeIndex - 2; 
   callers[1].args = &(args[pipeIndex + 2]);
-  callers[1].runner = commandList[secondCommandIndex].runner; // Vale lo mismo que firstCommandIndex si se llama sin pipe
+  callers[1].runner = (void**)commandList[secondCommandIndex].runner; // Vale lo mismo que firstCommandIndex si se llama sin pipe
   callers[1].screenId = 2;
 
   if (pipeIndex == -1) {
@@ -187,15 +187,17 @@ void runShell(unsigned int count, void** args) {
   clear_screen(1);
   caller helpCall = { &help, NULL, 0, 0 };
   sys_start(&helpCall);
+  _putc(STDOUT, '\n');
 
   while (1) {
     sys_showCursor(1);
-    _putc(STDOUT, '>');
+    _print("QUESOS>");
     char* args[MAX_ARGS];
     int count = getCommandLine(args);
     _putc(STDOUT, '\n');
     sys_showCursor(0);
     runCommandLine(count, args);
+    _putc(STDOUT, '\n');
   }
 }
 

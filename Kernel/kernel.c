@@ -104,7 +104,7 @@ int main()
 	printCheeseOs();
 	printCheese();
 
-	ncPrint("Press enter to log in\n");
+	print("Press enter to log in\n", 22);
 	while(getFromBuffer() != '\n');
 
   ((EntryPoint)sampleCodeModuleAddress)();
