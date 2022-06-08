@@ -1,13 +1,11 @@
 #include <syscalls.h>
 #include <keyboard.h>
-#include <inforeg.h>
+#include <snapshot.h>
 #include <console.h>
-#include <naiveConsole.h>
 #include <scheduler.h>
 #include <time.h>
 #include <interrupts.h>
 
-static uint64_t registers[TOTAL_REGISTERS] = {0};
 
 uint8_t sys_dateAndTime(uint64_t rtcID){
 	uint8_t x = _getRTCInfo(rtcID);
@@ -24,22 +22,11 @@ void sys_wait(uint64_t seconds){
     }
 }
 
-int sys_inforeg(uint64_t *buffer, uint64_t* rsp){
-    
-    for(int i = 0 ; i < TOTAL_REGISTERS ; i++){ //buffer[0] = r15, ... buffer[15] = rax
-        buffer[i] = registers[i];
-    }
-
+int sys_inforeg(uint64_t *buffer){
+    loadRegisters(buffer);
     return 0;
 }
 
-void snapshotRegisters(uint64_t* rsp){
-    for(int i = 0 ; i < TOTAL_REGISTERS ; i++){
-        registers[i] = rsp[i];
-        if(i == 16)
-            registers[i] = rsp[i+0x00000002];
-    }
-}
 
 void sys_getMem(uint64_t direc, uint8_t * buffer, uint64_t bytes){
     for (uint8_t i = 0; i < bytes; i++) {
@@ -94,7 +81,7 @@ uint64_t syscallHandler(syscall_id rax, uint64_t arg0, uint64_t arg1, uint64_t a
             clearScreen((FILE_DESCRIPTOR)arg0);
             return 0;
         case SYS_INFOREG:
-            return sys_inforeg((uint64_t *)arg1, (uint64_t*)rsp);
+            return sys_inforeg((uint64_t *)arg1);
         case SYS_DATENTIME:
             return sys_dateAndTime((uint64_t) arg0);
         case SYS_PRINTMEM:

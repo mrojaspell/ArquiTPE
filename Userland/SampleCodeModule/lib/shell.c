@@ -160,7 +160,7 @@ int runCommandLine(int argCount, char** args) {
   // Arma el "llamado" a la funcion, pasandoles los argumentos y la cantidad de argumentos
   caller callers[2];
   callers[0].argCount = (pipeIndex != -1) ? (pipeIndex - 1) : (argCount - 1); 
-  callers[0].args = &(args[1]);
+  callers[0].args = (void**)&(args[1]);
   callers[0].runner = commandList[firstCommandIndex].runner;
   callers[0].screenId = (pipeIndex == -1) ? 0 : 1;
 
@@ -185,6 +185,8 @@ int runCommandLine(int argCount, char** args) {
 
 void runShell(unsigned int count, void** args) {
   clear_screen(1);
+  caller helpCall = { &help, NULL, 0, 0 };
+  sys_start(&helpCall);
 
   while (1) {
     sys_showCursor(1);

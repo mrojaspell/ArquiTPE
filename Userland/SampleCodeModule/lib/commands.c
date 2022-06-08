@@ -22,26 +22,37 @@ static command commands[COMMANDS_LENGTH] = {
   { "clear", &clearScreen }
 };
 
+static char* commandInfo[COMMANDS_LENGTH + 1] = { 
+  "date&time : Imprime en patalla la fecha del ano corriente y horario en que fue\nllamado.\n",
+  "divzero: Realiza una division por 0. Lanza una excepcion e imprime una captura de los registros al momento de ejecucion.\n",
+  "fibonacci: Imprime la secuencia de fibonacci infinitamente hasta que se pause o se termine su ejecucion.\n",
+  "hello: Imprime un saludo al usuario.\n",
+  "help: Imprime una lista detallada de los comandos  y modulos ejecutables del\nprograma.\n",
+  "inforeg: Imprime los registros registros capturados al presionar ctrl + r.\n",
+  "invalidOpcode: Lanza la excepcion de invalid operand code e imprime los\nregistros al momento de ejecucion.\n",
+  "prime: imprime numeros primos infinitamente hasta que se pause o se termine su\nejecucion.\n",
+  "printmem [DIRECCION DE MEMORIA]: Recibe como argumento una direccion de memoria no superior a\n80000000h y luego imprime los proximos 32bytes de memoria adyacentes a la\ndireccion dada.\n",
+  "clear: Limpia la pantalla\n",
+  "Operaciones: usando la operacion | se puede correr dos funciones al mismo\ntiempo. \nPara terminar la ejecucion de un programa: \"esc\". Para pausar y resumir un\nprograma: \"p\". \nMientras se usa la operacion \"|\", pausar y resumir\nfuncion en pantalla izquierda \"a\", derecha \"d\".\n",
+};
 
-int divZero(){
+void divZero(){
   int aux1 = 1;
   int aux2 = 0;
-  int div0 = aux1/aux2;
-  return div0;
+  aux1/aux2;
 }
 
-int invalidOpcode(){
+void invalidOpcode(){
   _opcodeExp();
   sys_exit();
-  return 1;
 }
 
-int printmem(int argc, char* argv[]){
+void printmem(int argc, char* argv[]){
   if (argc < 1) {
     char* error_message = "No se dio una direccion de memoria\n";
     sys_write(STDERR, error_message, _strlen(error_message));
     sys_exit();
-    return 1;
+    return;
   } 
   char* address = argv[0];
   
@@ -52,7 +63,7 @@ int printmem(int argc, char* argv[]){
     char* error_message = "\nLa direccion ingresada no es alcanzable \n";
     sys_write(STDERR, error_message,_strlen(error_message));
     sys_exit();
-    return 1;
+    return;
   }
   _fprintf(STDOUT, "\nDump de 32 bytes a partir de la direccion: %s\n\n", address);
 
@@ -66,10 +77,9 @@ int printmem(int argc, char* argv[]){
   }
   _fprintf(STDOUT,"\n");
   sys_exit();
-  return 1;
 }
 
-int dateAndTime(){
+void dateAndTime(){
   uint64_t date = sys_dateAndTime(DAY_RTC_ID);
   uint64_t month = sys_dateAndTime(MONTH_RTC_ID);
   uint64_t year = sys_dateAndTime(YEAR_RTC_ID);
@@ -79,10 +89,9 @@ int dateAndTime(){
   uint64_t second = sys_dateAndTime(SECOND_RTC_ID);
   _fprintf(STDOUT,"\n Y el horario de este momento es: %d:%d:%d\n", hour, minute, second);
   sys_exit();
-  return 1;
 }
 
-int help(int argc, char* argv[]){
+void help(int argc, char* argv[]){
   if(argc == 0){
     _fprint(STDOUT, "Lista de posibles comandos: \n");
     for (uint8_t i = 0; i < COMMANDS_LENGTH; i++){
@@ -90,21 +99,19 @@ int help(int argc, char* argv[]){
     }
     _print("Lista de posibles operaciones: \n");
     _print("\tprogram1 | program2\n");
-    _print("help \"comando\"  para desplegar informacion detallada de cada comando\nhelp operaciones para informacion acerca de las operaciones posibles.\n");
+    _print("help [comando]  para desplegar informacion detallada de cada comando\nhelp operaciones para informacion acerca de las operaciones posibles.\n");
   } else {
-    int index = getDescriptions(argv[0]);
-    if (index != -1) {
-      char* mensaje = commandInfo[index];
-      _print(mensaje);
+    char* description = getDescriptions(argv[0]);
+    if (description != NULL) {
+      _print(description);
     } else {
       _fprintf(STDOUT, "%s no existe\n", argv[0]);
     }
   }
   sys_exit();
-    return 1;
 }
 
-int infoReg(){
+void infoReg(){
   static uint64_t registers[TOTAL_REGISTERS];
   sys_inforeg(registers);
 
@@ -113,34 +120,30 @@ int infoReg(){
     _fprintf(STDOUT, "%x\n",registers[i]);
   }
   sys_exit();
-  return 1;
 }
 
-int holaMundo() {
+void holaMundo() {
   _fprintf(STDOUT, "hola mundo");
   sys_exit();
-  return 1;
+}
+
+char* getDescriptions(char* function){  
+  for(int i = 0 ; i < COMMANDS_LENGTH; i++){
+    if(_strcasecmp(function, commands[i].name)){
+        return commandInfo[i];
+    }
+  }
+  if(_strcasecmp(function,"operaciones")){
+    return commandInfo[COMMANDS_LENGTH];
+  }
+  return NULL;
+}
+
+void clearScreen() {
+  clear_screen(0);
+  sys_exit();
 }
 
 command* getCommands() {
   return commands;
-}
-
-int getDescriptions(char* function){
-  int command = -1;
-  
-  for(int i = 0 ; i < COMMANDS_LENGTH; i++){
-    if(_strcasecmp(function, commands[i].name)){
-        command = i;
-    }
-  }
-  if(_strcasecmp(function,"operaciones")){
-    command = COMMANDS_LENGTH;
-  }
-  return command;
-}
-
-int clearScreen() {
-  clear_screen(0);
-  sys_exit();
 }

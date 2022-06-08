@@ -17,6 +17,7 @@ static int tasks = 0;
 int findNextFreeTask();
 int findTask(uint64_t pid);
 
+// Devuelve la proxima task que puede ser corrida, los no inicializados y los que estan corriendo
 int nextRunnableTask() {
   // Si vuelve a la misma task, que termine
   for (int i = 1; i < TASKQUANTITY; i += 1) {
@@ -57,7 +58,7 @@ uint64_t switchTask(uint64_t rsp, bool forced) {
       switchRsp(currentTask * PAGESIZE + baseRSP);
       endInterrupt();
       curr->program.runner(curr->program.argCount, curr->program.args);    
-      switchTask(0, true);
+      killTask(getPid());
     }
     endInterrupt();
     switchContext(curr->rsp);
@@ -115,7 +116,7 @@ void startTask(caller* function, uint64_t rsp) {
   switchRsp(freeIndex * PAGESIZE + baseRSP);
   endInterrupt();
   program->runner(program->argCount, program->args);
-  /* el programa no debe volver a esta posicion, todos los programas deberan hacer sys_exit */
+  killTask(getPid());
 }
 
 bool hasChilds(uint64_t pid) {

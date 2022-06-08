@@ -1,7 +1,5 @@
 #include <usersyscalls.h>
 
-
-
 int sys_read(uint8_t fd, char *buffer, size_t count) {
   return _syscall(SYS_READ_ID, fd, (uint64_t)buffer, 1);
 }

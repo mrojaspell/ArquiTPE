@@ -4,8 +4,7 @@
 #include <interrupts.h>
 #include <syscalls.h>
 
-
-//estas tablas de abajo las dejamos por las dudas pero borrar al final del trabajo    
+// Tablas que mapean scancodes a chars
 static char kbd_US [128] =
         {
                 0,  0, /* <-- esc */
@@ -80,16 +79,15 @@ static char shift_kbd_US [128] =
         };
 
 static bufferStruct bufferArray[2] ={{0}};
-static actualBuffer actualBuf = CHARBUFFER;
+static bufferIndex actualBuf = CHARBUFFER;
 static int isSpecial = 0;
+static int shiftFlag = 0;
+static int controlFlag = 0;
 
-void toggleBuffer(actualBuffer buf){
+void toggleBuffer(bufferIndex buf){
     actualBuf = buf;
     cleanBuffer();
 }
-
-static int shiftFlag = 0;
-static int controlFlag = 0;
 
 //para que no printee cosas raras cuando toco una tecla no imprimible como el control
 int isPrintable(uint8_t teclahex){
@@ -97,7 +95,6 @@ int isPrintable(uint8_t teclahex){
 }
 
 void keyboardHandler(uint64_t rsp){
-
     if (!_hasKey())
         return;
     
@@ -111,31 +108,30 @@ void keyboardHandler(uint64_t rsp){
         isSpecial = 0;
     }
 
-    if(actualBuf == CHARBUFFER){
-            //teclahex = teclahex & 0x00FF;
-            if(teclahex == 0xE0)
-                return;
-            if (teclahex == RSHIFT || teclahex == LSHIFT) //si toco shift
-                shiftFlag = 1;
-            else if (teclahex == RSHIFT+RELEASE || teclahex == LSHIFT+RELEASE) //si suelto shift
-                shiftFlag = 0;
-            else if(teclahex == LCTRL)
-                controlFlag = 1;
-            else if(teclahex == LCTRL + RELEASE)
-                controlFlag = 0;
-            else if(controlFlag && (kbd_US[teclahex]=='r')){
-                snapshotRegisters((uint64_t*) rsp);
-                controlFlag = 0;
-            }
-            else if (shiftFlag && isPrintable(teclahex)) //si es algo imprimible (no de retorno)
-                loadInBuffer(shift_kbd_US[teclahex]);
-            else if (isPrintable(teclahex))
-                loadInBuffer(kbd_US[teclahex]);
+    if(teclahex == 0xE0)
+        return;
+    if (teclahex == RSHIFT || teclahex == LSHIFT) //si toco shift
+        shiftFlag = 1;
+    else if (teclahex == RSHIFT+RELEASE || teclahex == LSHIFT+RELEASE) //si suelto shift
+        shiftFlag = 0;
+    else if(teclahex == LCTRL)
+        controlFlag = 1;
+    else if(teclahex == LCTRL + RELEASE)
+        controlFlag = 0;
+    else if(controlFlag && (kbd_US[teclahex]=='r')){
+        snapshotRegisters((uint64_t*) rsp);
+        controlFlag = 0;
+    } else {
+        if(actualBuf == CHARBUFFER){
+                if (shiftFlag && isPrintable(teclahex)) //si es algo imprimible (no de retorno)
+                    loadInBuffer(shift_kbd_US[teclahex]);
+                else if (isPrintable(teclahex))
+                    loadInBuffer(kbd_US[teclahex]);
+        }
+        else if(actualBuf == SCANCODEBUFFER){
+            loadInBuffer(teclahex);
+        }
     }
-    else if(actualBuf == SCANCODEBUFFER){
-        loadInBuffer(teclahex);
-    }
-
 }
 
 void loadInBuffer(uint8_t teclahex){
@@ -176,6 +172,7 @@ void cleanBuffer(){
     aux->overflow = 0;
     aux->write_i = aux->read_i = 0;
 }
+
 int bufferSize(){
     return bufferArray[actualBuf].write_i;
 }

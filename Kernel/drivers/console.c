@@ -2,14 +2,18 @@
 #include <colors.h>
 #include <naiveConsole.h>
 #include <time.h>
+#include <string.h>
 
+// Puntero a memoria del dispositivo de video
 static uint8_t * const video = (uint8_t*)0xB8000;
 
+// Tamaño total de pantalla
 static const uint32_t width = SCREEN_WIDTH;
 static const uint32_t height = SCREEN_HEIGHT;
 
 static char buffer[64] = { '0' };
 
+// Definimos los limites de las pantallas, debido a que la consigna indica una pantalla completa y 2 pantallas seaparadas.
 static window windows[3] = {
   { //stdout
     SCREEN_WIDTH, SCREEN_HEIGHT, {0, 0}, {0, 0}
@@ -59,17 +63,24 @@ void printCheese(){
 }
 
 
+// A que pantalla va a imprimir las funciones de escritura
 static int currentWindow = 0;
+
+// Indica si deberia mostrarse el cursor (visual) o no
+static int cursorActive = 0;
+
 static uint32_t uintToBase(uint64_t value, char * buffer, uint32_t base);
 
 void goNextPosition();
 uint8_t* getPosition(int y, int x);
 
+// Devuelve al comienzo el puntero a la posicion de la pantalla actual
 void restartCurrentPos() {
   windows[currentWindow].currPos.x = windows[currentWindow].start.x;
   windows[currentWindow].currPos.y = windows[currentWindow].start.y;
 }
 
+// Limpia la pantalla
 void clearScreen() {
   restartCurrentPos(currentWindow);
     
@@ -80,6 +91,7 @@ void clearScreen() {
   restartCurrentPos(currentWindow);
 }
 
+// Borra la primera linea y mueve todas las lineas inferiores una posicion hacia arriba
 void scrollUp() {
   window win = windows[currentWindow];
   for (int i = 1; i < win.height; i += 1) {
@@ -97,33 +109,39 @@ void scrollUp() {
   windows[currentWindow].currPos.y -= 1;
 }
 
+// Imprime en la base numeral que se necesita
 void printBase(uint64_t value, uint32_t base) {
   uintToBase(value, buffer, base);
   print(buffer, strlen(buffer));
 }
 
+// Imprime un string
 void print(char* str, size_t count) {
   for (int i = 0; i < count; i += 1) {
     printChar(str[i]);
   }
 }
 
+// Imprime string con color y background color
 void printColor(char* str, size_t count, color_t charColor, color_t bgColor) {
   for (int i = 0; i < count; i += 1) {
     printCharColor(str[i], charColor, bgColor, 1);
   }
 }
 
+// Imprime una linea hasta el final
 void newLine() {
   do {
     printChar(' ');
   } while (windows[currentWindow].currPos.x != windows[currentWindow].start.x);
 }
 
+// Imprime caracter en default
 void printChar(char c) {
   printCharColor(c, LGREY, BLACK, 1);
 }
 
+// Comienza desde cero las pantallas de izquierda, derecha y dibuja una linea que separa las pantallas
 void initializeDualScreen() {
   for (int i = 0; i < height; i += 1) {
     *(getPosition(i, width / 2 - 2)) = 219;
@@ -134,11 +152,13 @@ void initializeDualScreen() {
   restartCurrentPos();
 }
 
+// Comienza desde cero la pantalla principal
 void initializeSingleScreen() {
   currentWindow = 0;
   restartCurrentPos();
 }
 
+// Borra un caracter
 void deleteChar() {
   if(windows[currentWindow].currPos.x == windows[currentWindow].start.x){        
         if (windows[currentWindow].currPos.y > windows[currentWindow].start.y) {
@@ -152,6 +172,7 @@ void deleteChar() {
   }
 }
 
+// Escribe un caracter cualquiera con color. Con next decidis si pasar al siguiente caracter o no
 void printCharColor(char c, color_t charColor, color_t bgColor, int next){
   if(c == '\b') {
     deleteChar();
@@ -182,18 +203,17 @@ void printCharColor(char c, color_t charColor, color_t bgColor, int next){
   }
 }
 
-
+// Obtiene la posicion fisica en la memoria a partir de coordenadas y, x (fila, columna)
 uint8_t* getPosition(int y, int x) {
   return (video + x * 2 + y * width * 2);
 }
 
+// Pasa a la siguiente posicion de la pantalla. Si llega al final de la pantalla, pasa de fila
 void goNextPosition() {
   int goNextLine = windows[currentWindow].currPos.x == (windows[currentWindow].start.x + windows[currentWindow].width - 1);
   windows[currentWindow].currPos.x = (!goNextLine) ? windows[currentWindow].currPos.x + 1 : windows[currentWindow].start.x;
   windows[currentWindow].currPos.y += goNextLine;
 }
-
-static int cursorActive = 0;
 
 // si vale 1, esta activo
 void setCursor(int active) {
@@ -203,6 +223,7 @@ void setCursor(int active) {
   }
 }
 
+// Imprime el cursor visual dependiendo de cuantos ticks han pasado 
 void blinkCursor() {
   if (cursorActive) {
     if(ticks_elapsed() % 18 == 0)
@@ -212,10 +233,12 @@ void blinkCursor() {
   }
 }
 
+// Borra el cursor
 void stopCursor() {
   printCharColor(' ', WHITE, BLACK, 0);
 }
 
+// Cambia de pantalla
 void switchScreens(size_t screen) {
   if (screen < 3) {
     currentWindow = screen;

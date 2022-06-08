@@ -45,6 +45,7 @@ SECTION .text
 	push r15
 %endmacro
 
+
 %macro popStateNoRax 0
 	pop r15
 	pop r14
@@ -186,6 +187,7 @@ endInterrupt:
 	mov al, 20h
 	out 20h, al
 	pop rax
+	sti
 	ret
 
 switchRsp:

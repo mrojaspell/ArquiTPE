@@ -30,9 +30,8 @@ typedef enum {
 extern uint8_t _getRTCInfo(uint64_t);
 extern uint8_t _getMem(uint64_t direc);
 
-void sys_toggleBuffer();
 uint8_t sys_dateAndTime(uint64_t rtcID);
-int sys_inforeg(uint64_t *buffer, uint64_t* rsp);
+int sys_inforeg(uint64_t *buffer);
 void snapshotRegisters(uint64_t* rsp);
 void sys_getMem(uint64_t direc, uint8_t * buffer, uint64_t bytes);
 int sys_read(FILE_DESCRIPTOR fd, char* buffer, size_t count);

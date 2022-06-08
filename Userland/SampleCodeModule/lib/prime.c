@@ -27,7 +27,7 @@ bool isPrime(int num){
   return isPrime;
 }
 
-int primes(){
+void primes(){
   int num = 2;
   _fprintf(STDOUT, "prime : %d\n",num);
   num++;
@@ -40,6 +40,5 @@ int primes(){
     num += 2;
   }
   sys_exit();
-  return num;
 }
 

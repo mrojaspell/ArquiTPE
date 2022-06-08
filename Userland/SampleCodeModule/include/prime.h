@@ -10,6 +10,6 @@ typedef primeS * primeP;
 
 void initPrime(int screenId);
 //int prime(int argc, char* argv[], int screenId);
-int primes();
+void primes();
 
 #endif
